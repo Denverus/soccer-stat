@@ -14,6 +14,23 @@ app.get('/', function(request, response) {
   response.render('pages/index');
 });
 
+app.get('/games', function(request, response) {
+    response.render('pages/games');
+});
+
+app.get('/scorers', function(request, response) {
+    response.render('pages/scorers');
+});
+
+app.get('/assists', function(request, response) {
+    response.render('pages/assists');
+});
+
+app.get('/teamranking', function(request, response) {
+    response.render('pages/teamranking');
+});
+
+
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });

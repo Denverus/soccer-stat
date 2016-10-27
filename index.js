@@ -46,12 +46,12 @@ var mainApp = firebase.initializeApp(config);
 
 var database = firebase.database();
 
-firebase.database().ref('/players/player').once('value').then(function(snapshot) {
+database.ref('/players/player').once('value').then(function(snapshot) {
   var username = snapshot.val().FirstName;
-  console.log('Player First Name is ', username);
+  //console.log('Player First Name is ', username);
 });
 
-var commentsRef = firebase.database().ref('players');
+var commentsRef = database.ref('players');
 commentsRef.on('child_added', function(data) {
-  console.log('Player ', data.val());
+  //console.log('Player ', data.val());
 });

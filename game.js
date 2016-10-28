@@ -47,8 +47,11 @@ loadSquad = function(gameId, white, response) {
     };
     firebase.database.ref('/games/' + gameId + '/' + team+'/squad').once('value').then(function(snapshot) {
         var squad = snapshot.val();
-        var names = Object.keys(squad);
-        console.log('Squad '+team, names);
-        response(names);
+        var dataArray = new Array;
+        for(var o in squad) {
+            dataArray.push(squad[o]);
+        }
+        console.log('Squad '+team, dataArray);
+        response(dataArray);
     });
 }

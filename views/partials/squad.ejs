@@ -12,24 +12,14 @@
         </tr>
         </thead>
         <tbody>
+        <% for(var i=0; i < team.length; i++) { %>
         <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>1</td>
-            <td>0</td>
+            <th scope="row"><%= i+1 %></th>
+            <td><%= team[i] %></td>
+            <td><%= 0 %></td>
+            <td><%= 0 %></td>
         </tr>
-        <tr>
-            <th scope="row">2</th>
-            <td>Jacob</td>
-            <td>0</td>
-            <td>1</td>
-        </tr>
-        <tr>
-            <th scope="row">3</th>
-            <td>Larry</td>
-            <td>0</td>
-            <td>0</td>
-        </tr>
+        <% } %>
         </tbody>
     </table>
 </div>

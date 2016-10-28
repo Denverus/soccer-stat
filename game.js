@@ -15,6 +15,11 @@ module.exports = {
                     callback(null, squad);
                 });
             },
+            color: function(callback) {
+                loadSquad(gameId, false, function(squad) {
+                    callback(null, squad);
+                });
+            }
         }, function(err, results) {
             response(results);
         });
@@ -40,9 +45,10 @@ loadSquad = function(gameId, white, response) {
     if (white) {
         team = 'white';
     };
-    var squadRef = firebase.database.ref('/games/' + gameId + '/' + team+'/squad');
-    squadRef.on('child_added', function(snapshot) {
-        console.log('Squad '+team, snapshot.val());
-        response(snapshot.val());
+    firebase.database.ref('/games/' + gameId + '/' + team+'/squad').once('value').then(function(snapshot) {
+        var squad = snapshot.val();
+        var names = Object.keys(squad);
+        console.log('Squad '+team, names);
+        response(names);
     });
 }

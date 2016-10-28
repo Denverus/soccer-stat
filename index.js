@@ -1,5 +1,5 @@
 var express = require('express');
-var firebase = require("firebase");
+var gameTool = require('./game');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
@@ -11,23 +11,29 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
-  response.render('pages/index');
+  gameTool.loadGame('20161023', function(lastgame) {
+    console.log('Last game ', lastgame);
+    
+    response.render('pages/index', {
+      game: lastgame
+    });
+  });
 });
 
 app.get('/games', function(request, response) {
-    response.render('pages/games');
+  response.render('pages/games');
 });
 
 app.get('/scorers', function(request, response) {
-    response.render('pages/scorers');
+  response.render('pages/scorers');
 });
 
 app.get('/assists', function(request, response) {
-    response.render('pages/assists');
+  response.render('pages/assists');
 });
 
 app.get('/teamranking', function(request, response) {
-    response.render('pages/teamranking');
+  response.render('pages/teamranking');
 });
 
 
@@ -36,22 +42,9 @@ app.listen(app.get('port'), function() {
 });
 
 var config = {
-apiKey: "AIzaSyDH8qA0uF6b8AfNeaB7oz_T57_y7PXurqo",
-    authDomain: "russian-soccer.firebaseapp.com",
-    databaseURL: "https://russian-soccer.firebaseio.com",
-    storageBucket: "russian-soccer.appspot.com",
-    messagingSenderId: "476867980667"
+  apiKey: "AIzaSyDH8qA0uF6b8AfNeaB7oz_T57_y7PXurqo",
+  authDomain: "russian-soccer.firebaseapp.com",
+  databaseURL: "https://russian-soccer.firebaseio.com",
+  storageBucket: "russian-soccer.appspot.com",
+  messagingSenderId: "476867980667"
 };
-var mainApp = firebase.initializeApp(config);
-
-var database = firebase.database();
-
-database.ref('/players/player').once('value').then(function(snapshot) {
-  var username = snapshot.val().FirstName;
-  //console.log('Player First Name is ', username);
-});
-
-var commentsRef = database.ref('players');
-commentsRef.on('child_added', function(data) {
-  //console.log('Player ', data.val());
-});

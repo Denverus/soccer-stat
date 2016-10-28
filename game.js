@@ -19,6 +19,11 @@ module.exports = {
                 loadSquad(gameId, false, function(squad) {
                     callback(null, squad);
                 });
+            },
+            events: function(callback) {
+                loadEvents(gameId, function(squad) {
+                    callback(null, squad);
+                });
             }
         }, function(err, results) {
             response(results);
@@ -54,4 +59,59 @@ loadSquad = function(gameId, white, response) {
         console.log('Squad '+team, dataArray);
         response(dataArray);
     });
+}
+
+
+loadEvents = function(gameId, response) {
+    firebase.database.ref('/games/' + gameId + '/events').once('value').then(function(snapshot) {
+        var events = snapshot.val();
+        var dataArray = new Array;
+        for(var o in events) {
+            loadPlayer(o.author, function(player) {
+                dataArray.push(events[o]);
+            });
+        }
+        console.log('Events ', dataArray);
+        response(dataArray);
+    });
+}
+
+loadPlayer = function(playerid, response) {
+    firebase.database.ref('/players/' + playerid ).once('value').then(function(snapshot) {
+        var player = snapshot.val();
+        console.log('Player ', player);
+        response(player);
+    });
+}
+
+asyncLoop = function asyncLoop(iterations, func, callback) {
+    var index = 0;
+    var done = false;
+    var loop = {
+        next: function() {
+            if (done) {
+                return;
+            }
+
+            if (index < iterations) {
+                index++;
+                func(loop);
+
+            } else {
+                done = true;
+                callback();
+            }
+        },
+
+        iteration: function() {
+            return index - 1;
+        },
+
+        break: function() {
+            done = true;
+            callback();
+        }
+    };
+    loop.next();
+    return loop;
 }

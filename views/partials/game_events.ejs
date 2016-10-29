@@ -1,6 +1,10 @@
 <ul class="list-group">
 
     <% for(var i=0; i < events.length; i++) { %>
-    <li class="list-group-item"><%= events[i].score%> <%=events[i].author %> </li>
+    <li class="list-group-item"><%= events[i].score%> <%=events[i].author %>
+        <%if (events[i].assist != null) { %>
+        (<%=events[i].author %>)
+        <% } %>
+    </li>
     <% } %>
 </ul>

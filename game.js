@@ -54,6 +54,7 @@ loadSquad = function(gameId, white, response) {
         var squad = snapshot.val();
         var dataArray = new Array;
         for(var o in squad) {
+            squad[o].name = o;
             dataArray.push(squad[o]);
         }
         console.log('Squad '+team, dataArray);
@@ -67,9 +68,7 @@ loadEvents = function(gameId, response) {
         var events = snapshot.val();
         var dataArray = new Array;
         for(var o in events) {
-            loadPlayer(o.author, function(player) {
-                dataArray.push(events[o]);
-            });
+            dataArray.push(events[o]);
         }
         console.log('Events ', dataArray);
         response(dataArray);

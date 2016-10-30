@@ -9,15 +9,15 @@
     </div>
 </div>
 
-<div class="col-md-4 col-xs-12">
+<div class="col-md-4 col-md-push-4 col-xs-12">
+    <% var events = game.events; %>
+    <% include ../partials/game_events.ejs %>
+</div>
+
+<div class="col-md-4 col-md-pull-4 col-xs-12">
     <% var teamName = 'White'; %>
     <% var team = game.white; %>
     <% include ../partials/squad.ejs %>
-</div>
-
-<div class="col-md-4 col-xs-12">
-    <% var events = game.events; %>
-    <% include ../partials/game_events.ejs %>
 </div>
 
 <div class="col-md-4 col-xs-12">

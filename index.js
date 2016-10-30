@@ -12,20 +12,17 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.get('/', function (request, response) {
-    gameTool.loadGame('20161023', function (lastgame) {
-        statTool.loadStat(function (stat) {
-            console.log('game ', lastgame);
-            console.log('stat ', stat);
-            response.render('pages/index', {
-                game: lastgame,
-                stat: stat
-            });
+    gameTool.loadIndexPageData('20161023', function (data) {
+        console.log('Index page data ', data);
+        response.render('pages/index', {
+            lastGame: data.lastGame,
+            games: data.gameList
         });
     });
 });
 
 app.get('/games', function (request, response) {
-    statTool.loadAllGames(function (games) {
+    gameTool.loadGamesPageData(function (games) {
         console.log('Games list ', games);
         response.render('pages/games', {
             games: games
@@ -35,10 +32,11 @@ app.get('/games', function (request, response) {
 
 
 app.get('/game/:gameId', function (request, response) {
-    gameTool.loadGame(request.params.gameId, function (game) {
-        console.log('Single game ', game);
+    gameTool.loadOneGamePageData(request.params.gameId, function (data) {
+        console.log('Single game ', data);
         response.render('pages/single_game', {
-            game: game
+            game: data.game,
+            gameStat: data.gameStat
         });
     });
 });

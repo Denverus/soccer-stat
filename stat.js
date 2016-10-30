@@ -13,21 +13,6 @@ module.exports = {
         }, function (err, results) {
             response(results);
         });
-    },
-    loadAllGames: function(response) {
-        firebase.database.ref('/games').once('value').then(function (snapshot) {
-            var games = snapshot.val();
-            var gamesArray = [];
-
-            var gamesIndexArray = Object.keys(games);
-            for (var gameKey in gamesIndexArray) {
-                var gameId = gamesIndexArray[gameKey];
-                var game = games[gameId];
-                game.id = gameId;
-                gamesArray.push(game);
-            }
-            response(gamesArray);
-        });
     }
 };
 

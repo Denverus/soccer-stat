@@ -1,4 +1,4 @@
-<p class="text-right"><%= game.date %></p>
+<p class="text-right"><%= gameDate %></p>
 
 <div class="row">
     <div class="col-md-2 col-md-offset-5 col-xs-12">
@@ -10,19 +10,19 @@
 </div>
 
 <div class="col-md-4 col-xs-12">
-    <% var teamName = 'Color'; %>
-    <% var team = game.color; %>
+    <% var teamName = 'White'; %>
+    <% var team = game.white; %>
     <% include ../partials/squad.ejs %>
 </div>
 
 <div class="col-md-4 col-xs-12">
     <% var events = game.events; %>
     <% include ../partials/game_events.ejs %>
-
 </div>
 
 <div class="col-md-4 col-xs-12">
-    <% var teamName = 'White'; %>
-    <% var team = game.white; %>
+    <% var teamName = 'Color'; %>
+    <% var team = game.color; %>
     <% include ../partials/squad.ejs %>
 </div>
+

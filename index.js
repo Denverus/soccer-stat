@@ -1,5 +1,6 @@
 var express = require('express');
 var gameTool = require('./game');
+var statTool = require('./stat');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
@@ -12,10 +13,11 @@ app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
   gameTool.loadGame('20161023', function(lastgame) {
-    console.log('Last game ', lastgame);
-    
-    response.render('pages/index', {
-      game: lastgame
+    statTool.loadStat(function(stat) {
+      response.render('pages/index', {
+        game: lastgame,
+        stat: stat
+      });
     });
   });
 });

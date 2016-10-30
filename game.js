@@ -24,7 +24,7 @@ module.exports = {
                 loadEvents(gameId, function(squad) {
                     callback(null, squad);
                 });
-            }
+            },
         }, function(err, results) {
             response(results);
         });

@@ -25,6 +25,11 @@ module.exports = {
                     callback(null, squad);
                 });
             },
+            date: function(callback) {
+                loadDate(gameId, function(date) {
+                    callback(null, date);
+                });
+            },
         }, function(err, results) {
             response(results);
         });
@@ -38,12 +43,16 @@ loadScore = function(gameId, response) {
             color: game.color.score,
             white: game.white.score
         };
-        console.log('Score ', score);
-
         response(score);
     });
 }
 
+loadDate = function(gameId, response) {
+    firebase.database.ref('/games/' + gameId).once('value').then(function(snapshot) {
+        var game = snapshot.val();
+        response(game.date);
+    });
+}
 
 loadSquad = function(gameId, white, response) {
     var team = 'color';
@@ -57,7 +66,6 @@ loadSquad = function(gameId, white, response) {
             squad[o].name = o;
             dataArray.push(squad[o]);
         }
-        console.log('Squad '+team, dataArray);
         response(dataArray);
     });
 }
@@ -70,7 +78,6 @@ loadEvents = function(gameId, response) {
         for(var o in events) {
             dataArray.push(events[o]);
         }
-        console.log('Events ', dataArray);
         response(dataArray);
     });
 }
@@ -78,7 +85,6 @@ loadEvents = function(gameId, response) {
 loadPlayer = function(playerid, response) {
     firebase.database.ref('/players/' + playerid ).once('value').then(function(snapshot) {
         var player = snapshot.val();
-        console.log('Player ', player);
         response(player);
     });
 }

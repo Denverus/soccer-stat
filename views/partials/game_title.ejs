@@ -1,0 +1,18 @@
+<% var whiteScore = game.score.white; %>
+<% var colorScore = game.score.color; %>
+
+<% var whiteWon = whiteScore > colorScore; %>
+<% var colorWon = whiteScore < colorScore; %>
+
+<% if (whiteWon > 0) { %>
+<b>White</b>
+<% } else { %>
+White
+<% } %>
+-
+<% if (colorWon > 0) { %>
+<b>Color</b>
+<% } else { %>
+Color
+<% } %>
+<%= whiteScore %>:<%= colorScore %>

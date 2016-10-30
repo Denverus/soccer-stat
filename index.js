@@ -12,7 +12,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.get('/', function (request, response) {
-    gameTool.loadIndexPageData('20161023', function (data) {
+    gameTool.loadIndexPageData(function (data) {
         console.log('Index page data ', data);
         response.render('pages/index', {
             lastGame: data.lastGame,

@@ -3,20 +3,22 @@ var async = require('async');
 
 module.exports = {
 
-    loadIndexPageData: function (gameId, response) {
-        async.series({
-            lastGame: function (callback) {
-                loadFullGame(gameId, function (game) {
-                    callback(null, game);
-                });
-            },
-            gameList: function (callback) {
-                loadAllGames(function (allGames) {
-                    callback(null, allGames);
-                });
-            }
-        }, function (err, results) {
-            response(results);
+    loadIndexPageData: function (response) {
+        loadConfig(function (config) {
+            async.series({
+                lastGame: function (callback) {
+                    loadFullGame(config.lastgame, function (game) {
+                        callback(null, game);
+                    });
+                },
+                gameList: function (callback) {
+                    loadAllGames(function (allGames) {
+                        callback(null, allGames);
+                    });
+                }
+            }, function (err, results) {
+                response(results);
+            });
         });
     },
     loadGamesPageData: function (response) {
@@ -71,6 +73,12 @@ loadFullGame = function (gameId, response) {
         }
     }, function (err, results) {
         response(results);
+    });
+}
+
+loadConfig = function (response) {
+    firebase.database.ref('/config').once('value').then(function (snapshot) {
+        response(snapshot.val());
     });
 }
 

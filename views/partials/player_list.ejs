@@ -1,0 +1,22 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>Goals</th>
+        <th>Assists</th>
+        <th>Games</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(var i = 0; i < players.length; i++) { %>
+    <tr>
+        <th scope="row"><%= i + 1 %></th>
+        <td><%= players[i].name %></td>
+        <td><%= players[i].goals %></td>
+        <td><%= players[i].assists %></td>
+        <td><%= players[i].games %></td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>

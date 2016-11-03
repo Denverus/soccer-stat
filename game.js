@@ -42,6 +42,11 @@ module.exports = {
             response(results);
         });
     },
+    loadPlayersPageData: function (response) {
+        loadAllPlayersStat(function (players) {
+            response(players);
+        });
+    }
 };
 
 loadFullGame = function (gameId, response) {
@@ -173,6 +178,70 @@ loadAllGames = function (response) {
             gamesArray.push(game);
         }
         response(gamesArray);
+    });
+}
+
+convertListToArray = function (list) {
+    if (list == null) {
+        return [];
+    }
+    var objKeysArray = Object.keys(list);
+    var resultArray = [];
+    for (var objKey in objKeysArray) {
+        var objId = objKeysArray[objKey];
+        var obj = list[objId];
+        resultArray.push(obj);
+    }
+
+    return resultArray;
+}
+
+calcPlayerAppereance = function(playerMap, squad) {
+    for (var playerProp in squad) {
+        if (squad.hasOwnProperty(playerProp)) {
+            var player = playerMap.get(playerProp);
+            if (player != null) {
+                player.games++;
+            } else {
+                var player = {
+                    name: playerProp,
+                    games: 1,
+                    goals: 0,
+                    assists: 0
+                };
+                playerMap.set(playerProp, player);
+            }
+        }
+    }
+}
+
+loadAllPlayersStat = function (response) {
+    firebase.database.ref('/games').once('value').then(function (snapshot) {
+        var games = snapshot.val();
+        var playerArray = [];
+        var playerMap = new Map();
+
+        for (var gameProp in games) {
+            if (games.hasOwnProperty(gameProp)) {
+                var game = games[gameProp];
+
+                calcPlayerAppereance(playerMap, game.color.squad);
+                calcPlayerAppereance(playerMap, game.white.squad);
+
+                var events = game.events;
+                for (var eventProp in events) {
+                    if (events.hasOwnProperty(eventProp)) {
+                        var event = events[eventProp];
+                        var author = event.author;
+                    }
+                }
+            }
+        }
+        playerMap.forEach(function(value, key) {
+            playerArray.push(value);
+        });
+        console.log('playerArray ', playerArray);
+        response(playerArray);
     });
 }
 

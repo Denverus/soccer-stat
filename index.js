@@ -41,6 +41,16 @@ app.get('/game/:gameId', function (request, response) {
     });
 });
 
+
+app.get('/players', function (request, response) {
+    gameTool.loadPlayersPageData(function (players) {
+        console.log('Player list ', players);
+        response.render('pages/players', {
+            players: players
+        });
+    });
+});
+
 app.get('/scorers', function (request, response) {
     response.render('pages/scorers');
 });

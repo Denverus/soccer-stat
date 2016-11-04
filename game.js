@@ -196,6 +196,17 @@ convertListToArray = function (list) {
     return resultArray;
 }
 
+createPlayerStatObj = function(playerProp) {
+    var player = {
+        name: playerProp,
+        games: 0,
+        goals: 0,
+        assists: 0,
+        glas: 0
+    };
+    return player;
+}
+
 calcPlayerAppereance = function(playerMap, squad) {
     for (var playerProp in squad) {
         if (squad.hasOwnProperty(playerProp)) {
@@ -203,12 +214,8 @@ calcPlayerAppereance = function(playerMap, squad) {
             if (player != null) {
                 player.games++;
             } else {
-                var player = {
-                    name: playerProp,
-                    games: 1,
-                    goals: 0,
-                    assists: 0
-                };
+                var player = createPlayerStatObj(playerProp);
+                player.games = 1;
                 playerMap.set(playerProp, player);
             }
         }
@@ -232,7 +239,25 @@ loadAllPlayersStat = function (response) {
                 for (var eventProp in events) {
                     if (events.hasOwnProperty(eventProp)) {
                         var event = events[eventProp];
+
                         var author = event.author;
+                        var assist = event.assist;
+
+                        var player = playerMap.get(author);
+                        if (player == null) {
+                            player = createPlayerStatObj(author);
+                        }
+                        player.goals++;
+                        player.glas++;
+
+                        if (assist != null) {
+                            player = playerMap.get(author);
+                            if (player == null) {
+                                player = createPlayerStatObj(assist);
+                            }
+                            player.assists++;
+                            player.glas++;
+                        }
                     }
                 }
             }
@@ -241,6 +266,11 @@ loadAllPlayersStat = function (response) {
             playerArray.push(value);
         });
         console.log('playerArray ', playerArray);
+
+        playerArray.sort(function(a, b) {
+            return a.name.localeCompare(b.name);
+        });
+
         response(playerArray);
     });
 }

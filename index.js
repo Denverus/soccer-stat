@@ -16,7 +16,10 @@ app.get('/', function (request, response) {
         console.log('Index page data ', data);
         response.render('pages/index', {
             lastGame: data.lastGame,
-            games: data.gameList
+            games: data.gameList,
+            scorers: data.scorers,
+            assists: data.assists,
+            glas: data.glas
         });
     });
 });
@@ -43,7 +46,7 @@ app.get('/game/:gameId', function (request, response) {
 
 
 app.get('/players', function (request, response) {
-    gameTool.loadPlayersPageData(function (players) {
+    gameTool.loadPlayersPageData('name', function (players) {
         console.log('Player list ', players);
         response.render('pages/players', {
             players: players
@@ -52,11 +55,31 @@ app.get('/players', function (request, response) {
 });
 
 app.get('/scorers', function (request, response) {
-    response.render('pages/scorers');
+    gameTool.loadPlayersPageData('goal', function (players) {
+        console.log('Player list ', players);
+        response.render('pages/scorers', {
+            scorers: players
+        });
+    });
 });
 
 app.get('/assists', function (request, response) {
-    response.render('pages/assists');
+    gameTool.loadPlayersPageData('assist', function (players) {
+        console.log('Player list ', players);
+        response.render('pages/assists', {
+            assists: players
+        });
+    });
+});
+
+
+app.get('/glas', function (request, response) {
+    gameTool.loadPlayersPageData('glas', function (players) {
+        console.log('Player list ', players);
+        response.render('pages/glas', {
+            glas: players
+        });
+    });
 });
 
 app.get('/teamranking', function (request, response) {

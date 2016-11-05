@@ -1,0 +1,24 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>Goals</th>
+        <th>Games</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% var max = 5; %>
+    <% if (full_scorers) { %>
+    <% max = scorers.length; %>
+    <% } %>
+    <% for(var i = 0; i < max; i++) { %>
+    <tr>
+        <th scope="row"><%= i + 1 %></th>
+        <td><%= scorers[i].name %></td>
+        <td><%= scorers[i].goals %></td>
+        <td><%= scorers[i].games %></td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>

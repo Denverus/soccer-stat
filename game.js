@@ -15,6 +15,21 @@ module.exports = {
                     loadAllGames(function (allGames) {
                         callback(null, allGames);
                     });
+                },
+                scorers: function (callback) {
+                    loadAllPlayersStat('goal', function (players) {
+                        callback(null, players);
+                    });
+                },
+                assists: function (callback) {
+                    loadAllPlayersStat('assist', function (players) {
+                        callback(null, players);
+                    });
+                },
+                glas: function (callback) {
+                    loadAllPlayersStat('glas', function (players) {
+                        callback(null, players);
+                    });
                 }
             }, function (err, results) {
                 response(results);
@@ -42,8 +57,8 @@ module.exports = {
             response(results);
         });
     },
-    loadPlayersPageData: function (response) {
-        loadAllPlayersStat(function (players) {
+    loadPlayersPageData: function (order, response) {
+        loadAllPlayersStat(order, function (players) {
             response(players);
         });
     }
@@ -222,7 +237,7 @@ calcPlayerAppereance = function(playerMap, squad) {
     }
 }
 
-loadAllPlayersStat = function (response) {
+loadAllPlayersStat = function (order, response) {
     firebase.database.ref('/games').once('value').then(function (snapshot) {
         var games = snapshot.val();
         var playerArray = [];
@@ -265,9 +280,17 @@ loadAllPlayersStat = function (response) {
         playerMap.forEach(function(value, key) {
             playerArray.push(value);
         });
-        console.log('playerArray ', playerArray);
 
         playerArray.sort(function(a, b) {
+            if (order == 'goal') {
+                return b.goals - a.goals;
+            }
+            if (order == 'assist') {
+                return b.assists - a.assists;
+            }
+            if (order == 'glas') {
+                return b.glas - a.glas;
+            }
             return a.name.localeCompare(b.name);
         });
 

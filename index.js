@@ -82,8 +82,13 @@ app.get('/glas', function (request, response) {
     });
 });
 
-app.get('/teamranking', function (request, response) {
-    response.render('pages/teamranking');
+app.get('/player/:playerId', function (request, response) {
+    gameTool.loadPlayerProfilePageData(request.params.playerId, function (player) {
+        console.log('Player profile ', player);
+        response.render('pages/player', {
+            player: player
+        });
+    });
 });
 
 app.get('/test', function (request, response) {

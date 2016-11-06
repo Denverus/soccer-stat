@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Russian Soccer stat - Player</title>
+    <% include ../partials/header.ejs %>
+    <% include ../partials/counters.ejs %>
+</head>
+
+<body>
+
+<% include ../partials/nav.ejs %>
+
+<div id="main" class="container">
+
+    <div class="col-md-12 col-xs-12">
+        <h1><%= player.name %></h1>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                Games: <span class="badge"><%= player.summary.games %></span>
+                Wins: <span class="badge"><%= player.summary.wins %></span>
+                Draws: <span class="badge"><%= player.summary.draws %></span>
+                Losses: <span class="badge"><%= player.summary.losses %></span>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style ="word-break:break-all;">Date</th>
+                        <th style ="word-break:break-all;">Game</th>
+                        <th style ="word-break:break-all;">Team</th>
+                        <th style ="word-break:break-all;">Result</th>
+                        <th style ="word-break:break-all;">Goals</th>
+                        <th style ="word-break:break-all;">Asists</th>
+                        <th>G+A</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th><%= player.summary.goals %></th>
+                        <th><%= player.summary.asists %></th>
+                        <th><%= player.summary.glas %></th>
+                    </tr>
+                    <% for(var i = 0; i < player.games.length; i++) { %>
+                    <tr>
+                        <td><%= player.games[i].num %></td>
+                        <td><%= player.games[i].date %></td>
+                        <td><%= player.games[i].game %></td>
+                        <td>
+                            <% var team = player.games[i].team %>
+                            <% if (team != null) { %>
+                            <span class="icon-tshirt icon-<%= team %> normal"></span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% var win = player.games[i].win %>
+                            <% if (win == 1) { %>
+                            <span class="glyphicon glyphicon-ok-sign color-win"></span>
+                            <% } %>
+                            <% if (win == -1) { %>
+                            <span class="glyphicon glyphicon-remove-sign color-loss"></span>
+                            <% } %>
+                            <% if (win == 0) { %>
+                            <span class="glyphicon glyphicon-minus-sign color-draw"></span>
+                            <% } %>
+                        </td>
+                        <td><%= player.games[i].goals %></td>
+                        <td><%= player.games[i].asists %></td>
+                        <td><%= player.games[i].glas %></td>
+                    </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>

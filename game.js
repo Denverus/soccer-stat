@@ -61,6 +61,11 @@ module.exports = {
         loadAllPlayersStat(order, function (players) {
             response(players);
         });
+    },
+    loadPlayerProfilePageData: function (playerId, response) {
+        loadPlayerProfile(playerId, function (player) {
+            response(player);
+        });
     }
 };
 
@@ -296,6 +301,63 @@ loadAllPlayersStat = function (order, response) {
 
         response(playerArray);
     });
+}
+
+loadPlayerProfile = function (playerId, response) {
+    var player = {
+        name: 'denis',
+        summary: {
+            games: 2,
+            goals: 3,
+            asists: 1,
+            glas: 4,
+            wins: 2,
+            draws: 3,
+            losses: 1
+        },
+        games: [
+            {
+                num: 1,
+                date: '2016-10-24',
+                time: 100,
+                game: 'White - Color 2:5',
+                team: 'white',
+                win: 1,
+                goals: 2,
+                asists: 1,
+                glas: 3
+            },
+            {
+                num: 2,
+                date: '2016-10-31',
+                time: 0,
+                game: 'White - Color 5:2',
+            },
+            {
+                num: 3,
+                date: '2016-10-31',
+                time: 100,
+                game: 'White - Color 5:2',
+                win: 0,
+                team: 'color',
+                goals: 0,
+                asists: 1,
+                glas: 1
+            },
+            {
+                num: 4,
+                date: '2016-10-31',
+                time: 100,
+                game: 'White - Color 5:2',
+                win: -1,
+                team: 'color',
+                goals: 0,
+                asists: 1,
+                glas: 1
+            }
+        ]
+    };
+    response(player);
 }
 
 asyncLoop = function asyncLoop(iterations, func, callback) {

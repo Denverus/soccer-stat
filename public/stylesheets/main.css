@@ -1,19 +1,29 @@
 .jumbotron {
-  background: #532F8C;
-  color: white;
-  padding-bottom: 80px; }
-  .jumbotron .btn-primary {
+    background: #532F8C;
+    color: white;
+    padding-bottom: 80px;
+}
+
+.jumbotron .btn-primary {
     background: #845ac7;
-    border-color: #845ac7; }
-    .jumbotron .btn-primary:hover {
-      background: #7646c1; }
-  .jumbotron p {
+    border-color: #845ac7;
+}
+
+.jumbotron .btn-primary:hover {
+    background: #7646c1;
+}
+
+.jumbotron p {
     color: #d9ccee;
     max-width: 75%;
-    margin: 1em auto 2em; }
-  .navbar + .jumbotron {
-    margin-top: -20px; }
-  .jumbotron .lang-logo {
+    margin: 1em auto 2em;
+}
+
+.navbar + .jumbotron {
+    margin-top: -20px;
+}
+
+.jumbotron .lang-logo {
     display: block;
     background: #B01302;
     border-radius: 50%;
@@ -21,7 +31,62 @@
     width: 100px;
     height: 100px;
     margin: auto;
-    border: 2px solid white; }
-    .jumbotron .lang-logo img {
-      max-width: 100%; }
+    border: 2px solid white;
+}
 
+.jumbotron .lang-logo img {
+    max-width: 100%;
+}
+
+.icon-tshirt {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    float: left;
+    display: block; /* This is required */
+}
+
+.icon-tshirt.icon-white {
+    background: url(../images/white.png);
+    background-size: cover;
+}
+
+.icon-tshirt.icon-color {
+    background: url(../images/color.png);
+    background-size: cover;
+}
+
+.icon-tshirt.normal {
+    width: 24px;
+    height: 24px;
+}
+
+.icon-tshirt.small {
+    width: 16px;
+    height: 16px;
+}
+
+.icon-tshirt.medium {
+    width: 64px;
+    height: 64px;
+}
+
+.icon-tshirt.large {
+    width: 128px;
+    height: 128px;
+}
+
+.color-win {
+    color: #5CB85C;
+}
+
+.color-loss {
+    color: #FF0000;
+}
+
+.color-draw {
+    color: #898C78;
+}

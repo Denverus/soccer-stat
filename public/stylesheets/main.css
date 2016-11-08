@@ -79,6 +79,15 @@
     height: 128px;
 }
 
+
+.icon-tshirt.home {
+    float: left;
+}
+
+.icon-tshirt.away {
+    float: right;
+}
+
 .color-win {
     color: #5CB85C;
 }
@@ -89,4 +98,25 @@
 
 .color-draw {
     color: #898C78;
+}
+
+.icon-event {
+    position: relative;
+    top: 1px;
+    display: inline-block;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    float: left;
+    display: block; /* This is required */
+}
+
+.icon-goal {
+    background: url(../images/ball.png);
+    background-size: cover;
+}
+
+.icon-goal.normal {
+    width: 16px;
+    height: 16px;
 }

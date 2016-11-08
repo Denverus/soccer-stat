@@ -1,0 +1,12 @@
+<p class="text-right"><%= gameDate %></p>
+
+<div class="row">
+        <p class="text-center">
+            <% include ../partials/game_title.ejs %>
+        </p>
+</div>
+
+<div class="row">
+    <% var events = game.events; %>
+    <% include ../partials/game_events.ejs %>
+</div>

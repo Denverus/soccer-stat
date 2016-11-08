@@ -5,6 +5,7 @@
 
         <% for(var i = 0; i < events.length; i++) { %>
         <li class="list-group-item">
+            <span class="icon-event icon-goal normal"></span>
             <%= events[i].score %> <%= events[i].author %>
             <% if (events[i].type == 'owngoal') { %> (own goal) <% } %>
             <% if (events[i].assist != null) { %>

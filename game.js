@@ -260,23 +260,25 @@ loadAllPlayersStat = function (order, response) {
                     if (events.hasOwnProperty(eventProp)) {
                         var event = events[eventProp];
 
-                        var author = event.author;
-                        var assist = event.assist;
+                        if (event.type == null) {
+                            var author = event.author;
+                            var assist = event.assist;
 
-                        var player = playerMap.get(author);
-                        if (player == null) {
-                            player = createPlayerStatObj(author);
-                        }
-                        player.goals++;
-                        player.glas++;
-
-                        if (assist != null) {
-                            player = playerMap.get(author);
+                            var player = playerMap.get(author);
                             if (player == null) {
-                                player = createPlayerStatObj(assist);
+                                player = createPlayerStatObj(author);
                             }
-                            player.assists++;
+                            player.goals++;
                             player.glas++;
+
+                            if (assist != null) {
+                                player = playerMap.get(author);
+                                if (player == null) {
+                                    player = createPlayerStatObj(assist);
+                                }
+                                player.assists++;
+                                player.glas++;
+                            }
                         }
                     }
                 }

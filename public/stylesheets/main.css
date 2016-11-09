@@ -45,8 +45,15 @@
     font-style: normal;
     font-weight: normal;
     line-height: 1;
-    float: left;
     display: block; /* This is required */
+}
+
+.icon-tshirt.left {
+    float: left;
+}
+
+.icon-tshirt.right {
+    float: right;
 }
 
 .icon-tshirt.icon-white {
@@ -70,15 +77,14 @@
 }
 
 .icon-tshirt.medium {
-    width: 64px;
-    height: 64px;
+    width: 32px;
+    height: 32px;
 }
 
 .icon-tshirt.large {
-    width: 128px;
-    height: 128px;
+    width: 64px;
+    height: 64px;
 }
-
 
 .icon-tshirt.home {
     float: left;

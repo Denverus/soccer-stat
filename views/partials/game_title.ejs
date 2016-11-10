@@ -1,6 +1,7 @@
 <% var whiteWon = whiteScore > colorScore; %>
 <% var colorWon = whiteScore < colorScore; %>
 
+<span class="icon-tshirt icon-white home large left"></span>
 <% if (whiteWon > 0) { %>
 <b>White</b>
 <% } else { %>
@@ -13,3 +14,4 @@ White
 Color
 <% } %>
 <%= whiteScore %>:<%= colorScore %>
+<span class="icon-tshirt icon-color away large right"></span>

@@ -1,16 +1,16 @@
-<div class="panel panel-info">
+<ul class="list-group">
 
-    <div class="panel-heading">Goals</div>
-    <ul class="list-group">
-
-        <% for(var i = 0; i < events.length; i++) { %>
-        <li class="list-group-item">
-            <%= events[i].score %> <%= events[i].author %>
-            <% if (events[i].type == 'owngoal') { %> (own goal) <% } %>
-            <% if (events[i].assist != null) { %>
-            (<%= events[i].assist %>)
-            <% } %>
-        </li>
+    <% for(var i = 0; i < events.length; i++) { %>
+    <li class="list-group-item">
+        <span class="icon-event icon-goal normal left" style="margin-right: 5px;"></span>
+        <%= events[i].author %>
+        <% if (events[i].type == 'owngoal') { %>
+        (own goal)
         <% } %>
-    </ul>
-</div>
+        <% if (events[i].assist != null) { %>
+        (<%= events[i].assist %>)
+        <% } %>
+        <span class="icon-tshirt icon-<%= events[i].team %> normal right"></span>
+    </li>
+    <% } %>
+</ul>

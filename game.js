@@ -110,6 +110,7 @@ loadConfig = function (response) {
 loadOneGame = function (gameId, response) {
     firebase.database.ref('/games/' + gameId).once('value').then(function (snapshot) {
         var game = snapshot.val();
+        game.id = gameId;
         response(game);
     });
 }

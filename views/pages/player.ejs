@@ -46,14 +46,14 @@
                         <th></th>
                         <th></th>
                         <th><%= player.summary.goals %></th>
-                        <th><%= player.summary.asists %></th>
+                        <th><%= player.summary.assists %></th>
                         <th><%= player.summary.glas %></th>
                     </tr>
                     <% for(var i = 0; i < player.games.length; i++) { %>
                     <tr>
                         <td><%= player.games[i].num %></td>
                         <td><%= player.games[i].date %></td>
-                        <td><%= player.games[i].game %></td>
+                        <td><a href="/game/<%= player.games[i].gameId %>"><%= player.games[i].game %></a></td>
                         <td>
                             <% var team = player.games[i].team %>
                             <% if (team != null) { %>
@@ -72,9 +72,21 @@
                             <span class="glyphicon glyphicon-minus-sign color-draw"></span>
                             <% } %>
                         </td>
-                        <td><%= player.games[i].goals %></td>
-                        <td><%= player.games[i].asists %></td>
-                        <td><%= player.games[i].glas %></td>
+                        <td>
+                            <% if (team != null) { %>
+                            <%= player.games[i].goals %>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if (team != null) { %>
+                            <%= player.games[i].assists %>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if (team != null) { %>
+                            <%= player.games[i].glas %>
+                            <% } %>
+                        </td>
                     </tr>
                     <% } %>
                     </tbody>

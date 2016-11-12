@@ -3,12 +3,12 @@
     <% for(var i = 0; i < events.length; i++) { %>
     <li class="list-group-item">
         <span class="icon-event icon-goal normal left" style="margin-right: 5px;"></span>
-        <%= events[i].author %>
+        <a href="/player/<%= events[i].author %>"><%= events[i].author %></a>
         <% if (events[i].type == 'owngoal') { %>
         (own goal)
         <% } %>
         <% if (events[i].assist != null) { %>
-        (<%= events[i].assist %>)
+        <a href="/player/<%= events[i].assist %>">(<%= events[i].assist %>)</a>
         <% } %>
         <span class="icon-tshirt icon-<%= events[i].team %> normal right"></span>
     </li>

@@ -15,7 +15,7 @@
     <% for(var i = 0; i < max; i++) { %>
     <tr>
         <th scope="row"><%= i + 1 %></th>
-        <td><%= glas[i].name %></td>
+        <td><a href="/player/<%= glas[i].name %>"><%= glas[i].name %></a></td>
         <td><%= glas[i].glas %></td>
         <td><%= glas[i].games %></td>
     </tr>

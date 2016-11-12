@@ -198,6 +198,9 @@ loadAllGames = function (response) {
             game.id = gameId;
             gamesArray.push(game);
         }
+        gamesArray.sort(function (a, b) {
+            return b.id.localeCompare(a.id);
+        });
         response(gamesArray);
     });
 }
@@ -217,7 +220,7 @@ convertListToArray = function (list) {
     return resultArray;
 }
 
-createPlayerStatObj = function(playerProp) {
+createPlayerStatObj = function (playerProp) {
     var player = {
         name: playerProp,
         games: 0,
@@ -228,7 +231,7 @@ createPlayerStatObj = function(playerProp) {
     return player;
 }
 
-calcPlayerAppereance = function(playerMap, squad) {
+calcPlayerAppereance = function (playerMap, squad) {
     for (var playerProp in squad) {
         if (squad.hasOwnProperty(playerProp)) {
             var player = playerMap.get(playerProp);
@@ -273,7 +276,7 @@ loadAllPlayersStat = function (order, response) {
                             player.glas++;
 
                             if (assist != null) {
-                                player = playerMap.get(author);
+                                player = playerMap.get(assist);
                                 if (player == null) {
                                     player = createPlayerStatObj(assist);
                                 }
@@ -285,11 +288,11 @@ loadAllPlayersStat = function (order, response) {
                 }
             }
         }
-        playerMap.forEach(function(value, key) {
+        playerMap.forEach(function (value, key) {
             playerArray.push(value);
         });
 
-        playerArray.sort(function(a, b) {
+        playerArray.sort(function (a, b) {
             if (order == 'goal') {
                 return b.goals - a.goals;
             }
@@ -307,6 +310,147 @@ loadAllPlayersStat = function (order, response) {
 }
 
 loadPlayerProfile = function (playerId, response) {
+    firebase.database.ref('/games').once('value').then(function (snapshot) {
+        var games = snapshot.val();
+        var player = {
+            name: playerId,
+            summary: {
+                games: 0,
+                goals: 0,
+                assists: 0,
+                glas: 0,
+                wins: 0,
+                draws: 0,
+                losses: 0
+            },
+            games: []
+        };
+
+        for (var gameProp in games) {
+            if (games.hasOwnProperty(gameProp)) {
+                var dbGame = games[gameProp];
+
+                var result = "White - Color " + dbGame.white.score + ":" + dbGame.color.score;
+
+                var game = {
+                    num: dbGame.num,
+                    date: dbGame.date,
+                    time: 100,
+                    game: result,
+                    gameId: gameProp,
+                    team: null,
+                    win: null,
+                    goals: 0,
+                    assists: 0,
+                    glas: 0
+                };
+                var squadColor = dbGame.color.squad;
+                var squadWhite = dbGame.white.squad;
+                var whiteWon = 0;
+                var colorWon = 0;
+                var draw = 0;
+                if (dbGame.color.score > dbGame.white.score) {
+                    colorWon = 1;
+                }
+                if (dbGame.color.score < dbGame.white.score) {
+                    whiteWon = 1;
+                }
+                if (dbGame.color.score == dbGame.white.score) {
+                    draw = 1;
+                }
+
+                var squadTime = {
+                    color: calcPlayedTime(playerId, squadColor),
+                    white: calcPlayedTime(playerId, squadWhite)
+                };
+
+                if (squadTime.white > 0 || squadTime.color > 0) {
+                    player.summary.games++;
+                    if (squadTime.white > squadTime.color) {
+                        game.team = 'white';
+                    } else {
+                        game.team = 'color';
+                    }
+                }
+
+                calcGameAttendanceStat(playerId, squadTime, squadColor, 'color', 'white', colorWon, whiteWon, draw, player.summary, game);
+                calcGameAttendanceStat(playerId, squadTime, squadWhite, 'white', 'color', whiteWon, colorWon, draw, player.summary, game);
+
+                var events = dbGame.events;
+                for (var eventProp in events) {
+                    if (events.hasOwnProperty(eventProp)) {
+                        var event = events[eventProp];
+
+                        if (event.type == null) {
+                            var author = event.author;
+                            var assist = event.assist;
+
+                            if (author == playerId) {
+                                player.summary.goals++;
+                                game.goals++;
+                                player.summary.glas++;
+                                game.glas++;
+                            }
+
+                            if (assist == playerId) {
+                                player.summary.assists++;
+                                game.assists++;
+                                player.summary.glas++;
+                                game.glas++;
+                            }
+                        }
+                    }
+                }
+
+                player.games.push(game);
+            }
+        }
+
+        player.games.sort(function (a, b) {
+            return b.gameId.localeCompare(a.gameId);
+        });
+
+        response(player);
+    });
+}
+
+calcPlayedTime = function (playerId, squad) {
+    var result = 0;
+    for (var squadProp in squad) {
+        if (squad.hasOwnProperty(squadProp)) {
+            var playerInSquad = squad[squadProp];
+            if (squadProp == playerId) {
+                return playerInSquad.time;
+            }
+        }
+    }
+    return 0;
+}
+
+calcGameAttendanceStat = function (playerId, squadTime, squad, teamname, oppositeTeam, teamWon, opppositeWon, draw, summary, game) {
+    var result = 0;
+    for (var squadProp in squad) {
+        if (squad.hasOwnProperty(squadProp)) {
+            var playerInSquad = squad[squadProp];
+            if (squadProp == playerId) {
+                if (squadTime[teamname] > squadTime[oppositeTeam]) {
+                    summary.wins += teamWon;
+                    summary.draws += draw;
+                    summary.losses += opppositeWon;
+                    if (teamWon > 0) {
+                        game.win = 1;
+                    } else if (opppositeWon > 0) {
+                        game.win = -1;
+                    } else if (draw) {
+                        game.win = 0
+                    }
+                }
+            }
+        }
+    }
+}
+
+loadPlayerProfile2 = function (playerId, response) {
     var player = {
         name: 'denis',
         summary: {

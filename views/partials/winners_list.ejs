@@ -2,22 +2,27 @@
     <thead>
     <tr>
         <th>#</th>
-        <th>Player</th>
-        <th>W</th>
-        <th>D</th>
-        <th>L</th>
-        <th>Record</th>
-        <th></th>
+        <th style ="word-break:break-all;">Player</th>
+        <th style ="word-break:break-all;">W-D-L</th>
+	    <% if (full_scorers) { %>
+	    <th style ="word-break:break-all;">Wins%</th>
+	    <% } %>
+        <th style ="word-break:break-all;">Pts</th>
     </tr>
     </thead>
     <tbody>
-    <% for(var i = 0; i < winners.length; i++) { %>
+    <% var max = 5; %>
+    <% if (full_scorers) { %>
+    <% max = winners.length; %>
+    <% } %>
+    <% for(var i = 0; i < max; i++) { %>
     <tr>
         <th scope="row"><%= i + 1 %></th>
         <td><a href="/player/<%= winners[i].id %>"><%= winners[i].name %></a></td>
-        <td><%= winners[i].wins %></td>
-        <td><%= winners[i].draws %></td>
-        <td><%= winners[i].losses %></td>
+        <td><%= winners[i].wins %>-<%= winners[i].draws %>-<%= winners[i].losses %></td>
+	    <% if (full_scorers) { %>
+	    <td><%= winners[i].winsPers %></td>
+	    <% } %>
         <td><%= winners[i].points %></td>
     </tr>
     <% } %>

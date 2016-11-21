@@ -71,6 +71,11 @@ module.exports = {
         loadPlayerProfile(playerId, function (player) {
             response(player);
         });
+    },
+    loadWinnersPageData: function (order, response) {
+    	loadWinners(order, function (winners) {
+            response(winners);
+        });
     }
 };
 
@@ -439,14 +444,12 @@ allPlayersFromGame = function (game) {
     var whiteSquad = game.white.squad;
     for (var squadProp in colorSquad) {
         if (colorSquad.hasOwnProperty(squadProp)) {
-            var playerInSquad = colorSquad[squadProp];
-            players.push(playerInSquad);
+            players.push(squadProp);
         }
     }
     for (var squadProp in whiteSquad) {
         if (whiteSquad.hasOwnProperty(squadProp)) {
-            var playerInSquad = whiteSquad[squadProp];
-            players.push(playerInSquad);
+            players.push(squadProp);
         }
     }
     return players;
@@ -490,24 +493,25 @@ loadWinners = function (order, response) {
                 var colorSquad = game.color.squad;
                 var whiteSquad = game.white.squad;
 
-                for (var playerId in players) {
+                for (var index in players) {
 
+                	var playerId = players[index];
                     var player = playerMap.get(playerId);
                     if (player == null) {
-                        var player = {
+                        player = {
                             id: playerId,
-                            name: player,
+                            name: playerId,
                             wins: 0,
                             draws: 0,
                             losses: 0,
-                            points: 0
+                            points: 0,
+                            winsPers: 0
                         };
-                        playerMap.set(playerId, player);
                     }
 
                     var squadTime = {
-                        color: calcPlayedTime(playerId, squadColor),
-                        white: calcPlayedTime(playerId, squadWhite)
+                        color: calcPlayedTime(playerId, colorSquad),
+                        white: calcPlayedTime(playerId, whiteSquad)
                     };
 
                     if (squadTime.color > squadTime.white) {
@@ -519,7 +523,7 @@ loadWinners = function (order, response) {
                             player.draws ++;
                         }
                     } else {
-                        if (game.color.score > game.white.score) {
+                        if (game.color.score < game.white.score) {
                             player.wins ++;
                         } else if (game.color.score > game.white.score) {
                             player.losses ++;
@@ -527,21 +531,29 @@ loadWinners = function (order, response) {
                             player.draws ++;
                         }
                     }
+                    
+                    playerMap.set(playerId, player);
+                    
                 }
             }
         }
 
-        var players = [];
+        var result = [];
         playerMap.forEach(function (value, key) {
+        	// Points
             value.points = value.wins * 3 + value.draws;
-            players.push(value);
+            // Wins percentage
+            winsPers = value.wins / (value.wins + value.draws + value.losses);
+            value.winsPers = Math.round(winsPers * 1000) / 1000;
+            
+            result.push(value);
         });
 
-        players.sort(function (a, b) {
+        result.sort(function (a, b) {
             return b.points - a.points;
         });
 
-        response(players);
+        response(result);
     });
 }
 

@@ -92,6 +92,15 @@ app.get('/player/:playerId', function (request, response) {
     });
 });
 
+app.get('/winners', function (request, response) {
+    gameTool.loadWinnersPageData('point', function (winners) {
+        console.log('Winners', winners);
+        response.render('pages/winners', {
+        	winners: winners
+        });
+    });
+});
+
 app.get('/test', function (request, response) {
     response.render('pages/response');
 });

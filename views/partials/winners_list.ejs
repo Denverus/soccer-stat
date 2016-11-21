@@ -1,0 +1,30 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th style ="word-break:break-all;">Player</th>
+        <th style ="word-break:break-all;">W-D-L</th>
+	    <% if (full_scorers) { %>
+	    <th style ="word-break:break-all;">Wins%</th>
+	    <% } %>
+        <th style ="word-break:break-all;">Pts</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% var max = 5; %>
+    <% if (full_scorers) { %>
+    <% max = winners.length; %>
+    <% } %>
+    <% for(var i = 0; i < max; i++) { %>
+    <tr>
+        <th scope="row"><%= i + 1 %></th>
+        <td><a href="/player/<%= winners[i].id %>"><%= winners[i].name %></a></td>
+        <td><%= winners[i].wins %>-<%= winners[i].draws %>-<%= winners[i].losses %></td>
+	    <% if (full_scorers) { %>
+	    <td><%= winners[i].winsPers %></td>
+	    <% } %>
+        <td><%= winners[i].points %></td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>

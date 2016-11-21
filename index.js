@@ -19,7 +19,8 @@ app.get('/', function (request, response) {
             games: data.gameList,
             scorers: data.scorers,
             assists: data.assists,
-            glas: data.glas
+            glas: data.glas,
+            winners: data.winners
         });
     });
 });
@@ -87,6 +88,15 @@ app.get('/player/:playerId', function (request, response) {
         console.log('Player profile ', player);
         response.render('pages/player', {
             player: player
+        });
+    });
+});
+
+app.get('/winners', function (request, response) {
+    gameTool.loadWinnersPageData('point', function (winners) {
+        console.log('Winners', winners);
+        response.render('pages/winners', {
+        	winners: winners
         });
     });
 });

@@ -30,6 +30,11 @@ module.exports = {
                     loadAllPlayersStat('glas', function (players) {
                         callback(null, players);
                     });
+                },
+                winners: function (callback) {
+                    loadWinners('record', function (winners) {
+                        callback(null, winners);
+                    });
                 }
             }, function (err, results) {
                 response(results);
@@ -65,6 +70,11 @@ module.exports = {
     loadPlayerProfilePageData: function (playerId, response) {
         loadPlayerProfile(playerId, function (player) {
             response(player);
+        });
+    },
+    loadWinnersPageData: function (order, response) {
+    	loadWinners(order, function (winners) {
+            response(winners);
         });
     }
 };
@@ -427,7 +437,127 @@ calcPlayedTime = function (playerId, squad) {
     return 0;
 }
 
+
+allPlayersFromGame = function (game) {
+    var players = [];
+    var colorSquad = game.color.squad;
+    var whiteSquad = game.white.squad;
+    for (var squadProp in colorSquad) {
+        if (colorSquad.hasOwnProperty(squadProp)) {
+            players.push(squadProp);
+        }
+    }
+    for (var squadProp in whiteSquad) {
+        if (whiteSquad.hasOwnProperty(squadProp)) {
+            players.push(squadProp);
+        }
+    }
+    return players;
+}
+
 calcGameAttendanceStat = function (playerId, squadTime, squad, teamname, oppositeTeam, teamWon, opppositeWon, draw, summary, game) {
+    var result = 0;
+    for (var squadProp in squad) {
+        if (squad.hasOwnProperty(squadProp)) {
+            var playerInSquad = squad[squadProp];
+            if (squadProp == playerId) {
+                if (squadTime[teamname] > squadTime[oppositeTeam]) {
+                    summary.wins += teamWon;
+                    summary.draws += draw;
+                    summary.losses += opppositeWon;
+                    if (teamWon > 0) {
+                        game.win = 1;
+                    } else if (opppositeWon > 0) {
+                        game.win = -1;
+                    } else if (draw) {
+                        game.win = 0
+                    }
+                }
+            }
+        }
+    }
+}
+
+loadWinners = function (order, response) {
+    firebase.database.ref('/games').once('value').then(function (snapshot) {
+        var games = snapshot.val();
+
+        var playerMap = new Map();
+
+        for (var gameProp in games) {
+            if (games.hasOwnProperty(gameProp)) {
+                var game = games[gameProp];
+
+                var players = allPlayersFromGame(game);
+
+                var colorSquad = game.color.squad;
+                var whiteSquad = game.white.squad;
+
+                for (var index in players) {
+
+                	var playerId = players[index];
+                    var player = playerMap.get(playerId);
+                    if (player == null) {
+                        player = {
+                            id: playerId,
+                            name: playerId,
+                            wins: 0,
+                            draws: 0,
+                            losses: 0,
+                            points: 0,
+                            winsPers: 0
+                        };
+                    }
+
+                    var squadTime = {
+                        color: calcPlayedTime(playerId, colorSquad),
+                        white: calcPlayedTime(playerId, whiteSquad)
+                    };
+
+                    if (squadTime.color > squadTime.white) {
+                        if (game.color.score > game.white.score) {
+                            player.wins ++;
+                        } else if (game.color.score < game.white.score) {
+                            player.losses ++;
+                        } else if (game.color.score == game.white.score) {
+                            player.draws ++;
+                        }
+                    } else {
+                        if (game.color.score < game.white.score) {
+                            player.wins ++;
+                        } else if (game.color.score > game.white.score) {
+                            player.losses ++;
+                        } else if (game.color.score == game.white.score) {
+                            player.draws ++;
+                        }
+                    }
+                    
+                    playerMap.set(playerId, player);
+                    
+                }
+            }
+        }
+
+        var result = [];
+        playerMap.forEach(function (value, key) {
+        	// Points
+            value.points = value.wins * 3 + value.draws;
+            // Wins percentage
+            winsPers = value.wins / (value.wins + value.draws + value.losses);
+            value.winsPers = Math.round(winsPers * 1000) / 1000;
+            
+            result.push(value);
+        });
+
+        result.sort(function (a, b) {
+            return b.points - a.points;
+        });
+
+        response(result);
+    });
+}
+
+calcGameWinnerStat = function (playerId, squadTime, squad, teamname, oppositeTeam, teamWon, opppositeWon, draw, summary, game) {
     var result = 0;
     for (var squadProp in squad) {
         if (squad.hasOwnProperty(squadProp)) {

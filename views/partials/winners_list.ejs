@@ -1,0 +1,25 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>W</th>
+        <th>D</th>
+        <th>L</th>
+        <th>Record</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(var i = 0; i < winners.length; i++) { %>
+    <tr>
+        <th scope="row"><%= i + 1 %></th>
+        <td><a href="/player/<%= winners[i].id %>"><%= winners[i].name %></a></td>
+        <td><%= winners[i].wins %></td>
+        <td><%= winners[i].draws %></td>
+        <td><%= winners[i].losses %></td>
+        <td><%= winners[i].points %></td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>

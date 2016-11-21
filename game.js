@@ -30,6 +30,11 @@ module.exports = {
                     loadAllPlayersStat('glas', function (players) {
                         callback(null, players);
                     });
+                },
+                winners: function (callback) {
+                    loadWinners('record', function (winners) {
+                        callback(null, winners);
+                    });
                 }
             }, function (err, results) {
                 response(results);
@@ -427,7 +432,120 @@ calcPlayedTime = function (playerId, squad) {
     return 0;
 }
 
+
+allPlayersFromGame = function (game) {
+    var players = [];
+    var colorSquad = game.color.squad;
+    var whiteSquad = game.white.squad;
+    for (var squadProp in colorSquad) {
+        if (colorSquad.hasOwnProperty(squadProp)) {
+            var playerInSquad = colorSquad[squadProp];
+            players.push(playerInSquad);
+        }
+    }
+    for (var squadProp in whiteSquad) {
+        if (whiteSquad.hasOwnProperty(squadProp)) {
+            var playerInSquad = whiteSquad[squadProp];
+            players.push(playerInSquad);
+        }
+    }
+    return players;
+}
+
 calcGameAttendanceStat = function (playerId, squadTime, squad, teamname, oppositeTeam, teamWon, opppositeWon, draw, summary, game) {
+    var result = 0;
+    for (var squadProp in squad) {
+        if (squad.hasOwnProperty(squadProp)) {
+            var playerInSquad = squad[squadProp];
+            if (squadProp == playerId) {
+                if (squadTime[teamname] > squadTime[oppositeTeam]) {
+                    summary.wins += teamWon;
+                    summary.draws += draw;
+                    summary.losses += opppositeWon;
+                    if (teamWon > 0) {
+                        game.win = 1;
+                    } else if (opppositeWon > 0) {
+                        game.win = -1;
+                    } else if (draw) {
+                        game.win = 0
+                    }
+                }
+            }
+        }
+    }
+}
+
+loadWinners = function (order, response) {
+    firebase.database.ref('/games').once('value').then(function (snapshot) {
+        var games = snapshot.val();
+
+        var playerMap = new Map();
+
+        for (var gameProp in games) {
+            if (games.hasOwnProperty(gameProp)) {
+                var game = games[gameProp];
+
+                var players = allPlayersFromGame(game);
+
+                var colorSquad = game.color.squad;
+                var whiteSquad = game.white.squad;
+
+                for (var playerId in players) {
+
+                    var player = playerMap.get(playerId);
+                    if (player == null) {
+                        var player = {
+                            id: playerId,
+                            name: player,
+                            wins: 0,
+                            draws: 0,
+                            losses: 0,
+                            points: 0
+                        };
+                        playerMap.set(playerId, player);
+                    }
+
+                    var squadTime = {
+                        color: calcPlayedTime(playerId, squadColor),
+                        white: calcPlayedTime(playerId, squadWhite)
+                    };
+
+                    if (squadTime.color > squadTime.white) {
+                        if (game.color.score > game.white.score) {
+                            player.wins ++;
+                        } else if (game.color.score < game.white.score) {
+                            player.losses ++;
+                        } else if (game.color.score == game.white.score) {
+                            player.draws ++;
+                        }
+                    } else {
+                        if (game.color.score > game.white.score) {
+                            player.wins ++;
+                        } else if (game.color.score > game.white.score) {
+                            player.losses ++;
+                        } else if (game.color.score == game.white.score) {
+                            player.draws ++;
+                        }
+                    }
+                }
+            }
+        }
+
+        var players = [];
+        playerMap.forEach(function (value, key) {
+            value.points = value.wins * 3 + value.draws;
+            players.push(value);
+        });
+
+        players.sort(function (a, b) {
+            return b.points - a.points;
+        });
+
+        response(players);
+    });
+}
+
+calcGameWinnerStat = function (playerId, squadTime, squad, teamname, oppositeTeam, teamWon, opppositeWon, draw, summary, game) {
     var result = 0;
     for (var squadProp in squad) {
         if (squad.hasOwnProperty(squadProp)) {

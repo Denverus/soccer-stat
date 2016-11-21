@@ -19,7 +19,8 @@ app.get('/', function (request, response) {
             games: data.gameList,
             scorers: data.scorers,
             assists: data.assists,
-            glas: data.glas
+            glas: data.glas,
+            winners: data.winners
         });
     });
 });

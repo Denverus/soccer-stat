@@ -1,6 +1,11 @@
 <ul class="list-group">
 
-    <% for (var i = 0; i < games.length; i++) { %>
+    <% var max = 5; %>
+    <% if (full_scorers) { %>
+    <% max = games.length; %>
+    <% } %>
+
+    <% for (var i = 0; i < max; i++) { %>
     <% var whiteScore = games[i].white.score; %>
     <% var colorScore = games[i].color.score; %>
 

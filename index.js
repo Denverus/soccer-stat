@@ -20,7 +20,8 @@ app.get('/', function (request, response) {
             scorers: data.scorers,
             assists: data.assists,
             glas: data.glas,
-            winners: data.winners
+            winners: data.winners,
+            captains: data.captains
         });
     });
 });
@@ -101,6 +102,14 @@ app.get('/winners', function (request, response) {
     });
 });
 
+app.get('/captains', function (request, response) {
+    gameTool.loadCaptainsPageData('point', function (captains) {
+        console.log('Captains', captains);
+        response.render('pages/captains', {
+            captains: captains
+        });
+    });
+});
 app.get('/test', function (request, response) {
     response.render('pages/response');
 });

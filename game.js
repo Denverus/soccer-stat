@@ -35,6 +35,11 @@ module.exports = {
                     loadWinners('record', function (winners) {
                         callback(null, winners);
                     });
+                },
+                captains: function (callback) {
+                    loadCaptainsStat('record', function (captains) {
+                        callback(null, captains);
+                    });
                 }
             }, function (err, results) {
                 response(results);
@@ -75,6 +80,11 @@ module.exports = {
     loadWinnersPageData: function (order, response) {
     	loadWinners(order, function (winners) {
             response(winners);
+        });
+    },
+    loadCaptainsPageData: function (order, response) {
+        loadCaptainsStat(order, function (captains) {
+            response(captains);
         });
     }
 };
@@ -578,6 +588,69 @@ calcGameWinnerStat = function (playerId, squadTime, squad, teamname, oppositeTea
             }
         }
     }
+}
+
+loadCaptainsStat = function (order, response) {
+    firebase.database.ref('/games').once('value').then(function (snapshot) {
+        var games = snapshot.val();
+
+        var captainMap = new Map();
+
+        for (var gameProp in games) {
+            if (games.hasOwnProperty(gameProp)) {
+                var game = games[gameProp];
+
+                if (game.color.captain != null) {
+                    updateCaptainStat(captainMap, game.color.captain, game.color.score, game.white.score);
+                }
+                if (game.white.captain != null) {
+                    updateCaptainStat(captainMap, game.white.captain, game.white.score, game.color.score);
+                }
+            }
+        }
+
+        var result = [];
+        captainMap.forEach(function (value, key) {
+            // Points
+            value.points = value.wins * 3 + value.draws;
+            // Wins percentage
+            winsPers = value.wins / (value.wins + value.draws + value.losses);
+            value.winsPers = Math.round(winsPers * 1000) / 1000;
+
+            result.push(value);
+        });
+
+        result.sort(function (a, b) {
+            return b.points - a.points;
+        });
+
+        response(result);
+    });
+}
+
+updateCaptainStat = function(captainMap, captainId, goalsScored, goalsConceded) {
+    var captain = captainMap.get(captainId);
+    if (captain == null) {
+        captain = {
+            id: captainId,
+            name: captainId,
+            wins: 0,
+            draws: 0,
+            losses: 0,
+            points: 0,
+            winsPers: 0
+        };
+    }
+
+        if (goalsScored > goalsConceded) {
+            captain.wins ++;
+        } else if (goalsScored < goalsConceded) {
+            captain.losses ++;
+        } else if (goalsScored == goalsConceded) {
+            captain.draws ++;
+        }
+
+    captainMap.set(captainId, captain);
 }
 
 loadPlayerProfile2 = function (playerId, response) {

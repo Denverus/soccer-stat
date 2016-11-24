@@ -11,6 +11,60 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
+var nav = [
+    {
+        title: 'Home',
+        icon: 'home',
+        url: '/'
+    },
+    {
+        title: 'Games',
+        icon: 'cd',
+        url: '/games'
+    },
+    {
+        title: 'All players',
+        icon: 'user',
+        url: '/players'
+    },
+    {
+        title: 'Scorers',
+        icon: 'record',
+        url: '/scorers'
+    },
+    {
+        title: 'Assists',
+        icon: 'thumbs-up',
+        url: '/assists'
+    },
+    {
+        title: 'Goal + Pass',
+        icon: 'star',
+        url: '/glas'
+    },
+    {
+        title: 'Winners',
+        icon: 'asterisk',
+        url: '/winners'
+    },
+    {
+        title: 'Captains',
+        icon: 'king',
+        url: '/captains'
+    }
+];
+
+getNavFor = function(url) {
+    for(var i = 0; i < nav.length; i++) {
+        if (nav[i].url == url) {
+            nav[i].active = true;
+        } else {
+            nav[i].active = false;
+        }
+    }
+    return nav;
+};
+
 app.get('/', function (request, response) {
     gameTool.loadIndexPageData(function (data) {
         console.log('Index page data ', data);
@@ -21,7 +75,8 @@ app.get('/', function (request, response) {
             assists: data.assists,
             glas: data.glas,
             winners: data.winners,
-            captains: data.captains
+            captains: data.captains,
+            nav: getNavFor('/')
         });
     });
 });
@@ -30,7 +85,8 @@ app.get('/games', function (request, response) {
     gameTool.loadGamesPageData(function (games) {
         console.log('Games list ', games);
         response.render('pages/games', {
-            games: games
+            games: games,
+            nav: getNavFor('/games')
         });
     });
 });
@@ -41,7 +97,8 @@ app.get('/game/:gameId', function (request, response) {
         console.log('Single game ', data);
         response.render('pages/single_game', {
             game: data.game,
-            gameStat: data.gameStat
+            gameStat: data.gameStat,
+            nav: getNavFor('')
         });
     });
 });
@@ -51,7 +108,8 @@ app.get('/players', function (request, response) {
     gameTool.loadPlayersPageData('name', function (players) {
         console.log('Player list ', players);
         response.render('pages/players', {
-            players: players
+            players: players,
+            nav: getNavFor('/players')
         });
     });
 });
@@ -60,7 +118,8 @@ app.get('/scorers', function (request, response) {
     gameTool.loadPlayersPageData('goal', function (players) {
         console.log('Player list ', players);
         response.render('pages/scorers', {
-            scorers: players
+            scorers: players,
+            nav: getNavFor('/scorers')
         });
     });
 });
@@ -69,7 +128,8 @@ app.get('/assists', function (request, response) {
     gameTool.loadPlayersPageData('assist', function (players) {
         console.log('Player list ', players);
         response.render('pages/assists', {
-            assists: players
+            assists: players,
+            nav: getNavFor('/assists')
         });
     });
 });
@@ -79,7 +139,8 @@ app.get('/glas', function (request, response) {
     gameTool.loadPlayersPageData('glas', function (players) {
         console.log('Player list ', players);
         response.render('pages/glas', {
-            glas: players
+            glas: players,
+            nav: getNavFor('/glas')
         });
     });
 });
@@ -88,7 +149,8 @@ app.get('/player/:playerId', function (request, response) {
     gameTool.loadPlayerProfilePageData(request.params.playerId, function (player) {
         console.log('Player profile ', player);
         response.render('pages/player', {
-            player: player
+            player: player,
+            nav: getNavFor('')
         });
     });
 });
@@ -97,7 +159,8 @@ app.get('/winners', function (request, response) {
     gameTool.loadWinnersPageData('point', function (winners) {
         console.log('Winners', winners);
         response.render('pages/winners', {
-        	winners: winners
+        	winners: winners,
+            nav: getNavFor('/winners')
         });
     });
 });
@@ -106,7 +169,8 @@ app.get('/captains', function (request, response) {
     gameTool.loadCaptainsPageData('point', function (captains) {
         console.log('Captains', captains);
         response.render('pages/captains', {
-            captains: captains
+            captains: captains,
+            nav: getNavFor('/captains')
         });
     });
 });

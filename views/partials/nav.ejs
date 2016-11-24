@@ -12,16 +12,15 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active">
-                    <a href="/"><span class="glyphicon glyphicon-home"></span> Home</a>
-                </li>
-                <li><a href="/games"><span class="glyphicon glyphicon-cd"></span> Games</a></li>
-                <li><a href="/players"><span class="glyphicon glyphicon-user"></span>All players</a></li>
-                <li><a href="/scorers"><span class="glyphicon glyphicon-record"></span>Scorers</a></li>
-                <li><a href="/assists"><span class="glyphicon glyphicon-thumbs-up"></span>Assists</a></li>
-                <li><a href="/glas"><span class="glyphicon glyphicon-star"></span>Goal + Pass</a></li>
-                <li><a href="/winners"><span class="glyphicon glyphicon-asterisk"></span>Winners</a></li>
-                <li><a href="/captains"><span class="glyphicon glyphicon-king"></span>Captains</a></li>
+                <% for (var i = 0; i < nav.length; i++) { %>
+                <% if (nav[i].active) { %>
+                    <li class="active">
+                <% } else { %>
+                    <li>
+                <% }  %>
+                        <a href="<%= nav[i].url %>"><span class="glyphicon glyphicon-<%= nav[i].icon %>"></span> <%= nav[i].title %></a>
+                    </li>
+                <% } %>
             </ul>
         </div>
         <!--/.nav-collapse -->

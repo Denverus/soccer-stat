@@ -1,6 +1,11 @@
 <div class="panel panel-info">
 
-    <div class="panel-heading"><%= teamName %></div>
+    <div class="panel-heading"><%= teamName %>
+        <% if (captain != null) { %>
+        - captain:
+        <b><%= captain %></b>
+        <% } %>
+    </div>
     <!-- Table -->
     <table class="table">
         <thead>

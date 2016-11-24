@@ -216,6 +216,7 @@ loadAllGames = function (response) {
             var gameId = gamesIndexArray[gameKey];
             var game = games[gameId];
             game.id = gameId;
+            game.playersCount = calcPlayerCount(game);
             gamesArray.push(game);
         }
         gamesArray.sort(function (a, b) {
@@ -223,6 +224,21 @@ loadAllGames = function (response) {
         });
         response(gamesArray);
     });
+}
+
+calcPlayerCount = function(game) {
+    if (game.color.squad == null || game.white.squad == null) {
+        return null;
+    }
+
+    var colorSquadArray = Object.keys(game.color.squad);
+    var whiteSquadArray = Object.keys(game.white.squad);
+
+    if (colorSquadArray != null && whiteSquadArray != null) {
+        return colorSquadArray.length + whiteSquadArray.length;
+    }
+
+    return null;
 }
 
 convertListToArray = function (list) {

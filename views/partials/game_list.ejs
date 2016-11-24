@@ -1,7 +1,7 @@
 <ul class="list-group">
 
     <% var max = 5; %>
-    <% if (full_scorers) { %>
+    <% if (full) { %>
     <% max = games.length; %>
     <% } %>
 
@@ -11,6 +11,8 @@
 
     <% var whiteWon = whiteScore > colorScore; %>
     <% var colorWon = whiteScore < colorScore; %>
+
+    <% var playersCount = games[i].playersCount; %>
 
     <li class="list-group-item">
         <span class="badge"><%= games[i].date %></span>
@@ -28,6 +30,11 @@
         <% } %>
         <%= whiteScore %>:<%= colorScore %>
         </a>
+        <% if (full) { %>
+            <%if (playersCount != null) { %>
+            <span class="glyphicon glyphicon-user" style="padding-left: 10px"><%= playersCount %></span>
+            <% } %>
+        <% } %>
     </li>
     <% } %>
 </ul>

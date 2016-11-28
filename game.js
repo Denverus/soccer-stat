@@ -86,6 +86,11 @@ module.exports = {
         loadCaptainsStat(order, function (captains) {
             response(captains);
         });
+    },
+    loadTrinityPageData: function (order, response) {
+        loadTrinityStat(order, function (trinity) {
+            response(trinity);
+        });
     }
 };
 
@@ -607,6 +612,44 @@ calcGameWinnerStat = function (playerId, squadTime, squad, teamname, oppositeTea
 }
 
 loadCaptainsStat = function (order, response) {
+    firebase.database.ref('/games').once('value').then(function (snapshot) {
+        var games = snapshot.val();
+
+        var captainMap = new Map();
+
+        for (var gameProp in games) {
+            if (games.hasOwnProperty(gameProp)) {
+                var game = games[gameProp];
+
+                if (game.color.captain != null) {
+                    updateCaptainStat(captainMap, game.color.captain, game.color.score, game.white.score);
+                }
+                if (game.white.captain != null) {
+                    updateCaptainStat(captainMap, game.white.captain, game.white.score, game.color.score);
+                }
+            }
+        }
+
+        var result = [];
+        captainMap.forEach(function (value, key) {
+            // Points
+            value.points = value.wins * 3 + value.draws;
+            // Wins percentage
+            winsPers = value.wins / (value.wins + value.draws + value.losses);
+            value.winsPers = Math.round(winsPers * 1000) / 1000;
+
+            result.push(value);
+        });
+
+        result.sort(function (a, b) {
+            return b.points - a.points;
+        });
+
+        response(result);
+    });
+}
+
+loadTrinityStat = function (order, response) {
     firebase.database.ref('/games').once('value').then(function (snapshot) {
         var games = snapshot.val();
 

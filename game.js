@@ -87,8 +87,8 @@ module.exports = {
             response(captains);
         });
     },
-    loadTrinityPageData: function (order, response) {
-        loadTrinityStat(order, function (trinity) {
+    loadTrinityPageData: function (size, order, response) {
+        loadTrinityStat(size, order, function (trinity) {
             response(trinity);
         });
     }
@@ -649,7 +649,7 @@ loadCaptainsStat = function (order, response) {
     });
 }
 
-loadTrinityStat = function (order, response) {
+loadTrinityStat = function (size, order, response) {
     firebase.database.ref('/games').once('value').then(function (snapshot) {
         var games = snapshot.val();
 
@@ -659,8 +659,8 @@ loadTrinityStat = function (order, response) {
             if (games.hasOwnProperty(gameProp)) {
                 var game = games[gameProp];
                 
-                var allColorTrinity = allTrinityFromSquad(game.color.squad);
-                var allWhiteTrinity = allTrinityFromSquad(game.white.squad);
+                var allColorTrinity = allTrinityFromSquad(game.color.squad, size);
+                var allWhiteTrinity = allTrinityFromSquad(game.white.squad, size);
 
                 for (var colorTrinity in allColorTrinity) {
                 	updateTrinityStat(trinityMap, allColorTrinity[colorTrinity], game.color.score, game.white.score);
@@ -724,7 +724,7 @@ updateCaptainStat = function(captainMap, captainId, goalsScored, goalsConceded) 
     captainMap.set(captainId, captain);
 }
 
-allTrinityFromSquad = function(squad) {
+allTrinityFromSquad = function(squad, size) {
 	var trinities = [];
     for (var squadProp in squad) {
         if (squad.hasOwnProperty(squadProp)) {
@@ -733,16 +733,42 @@ allTrinityFromSquad = function(squad) {
     }
     
 	var result = [];
-    for (var i=0; i<trinities.length; i++) {
+    /*for (var i=0; i<trinities.length; i++) {
     	for (var j=i+1; j<trinities.length; j++) {
         	for (var k=j+1; k<trinities.length; k++) {
         		trinity = trinityId(trinities[i], trinities[j], trinities[k]);
         		result.push(trinity);
         	}
     	}
-    }
+    }*/
+
+    doNestedLoop(trinities, [], 0, size, result);
     
 	return result;
+}
+
+function doNestedLoop(squad, indexes, start, size, result) {
+    if (indexes.length < size) {
+        for (var i=start; i<squad.length; i++) {
+            indexes.push(i);
+            doNestedLoop(squad, indexes, i+1, size, result);
+            indexes.splice(indexes.length-1, 1);
+        }
+    } else {
+        var couple = [];
+        for (var i=0; i<indexes.length; i++) {
+            couple.push(squad[indexes[i]]);
+        }
+        couple.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        console.log('New couple ', couple.toString());
+        result.push(couple.toString());
+    }
+}
+
+function isInArray(value, array) {
+    return array.indexOf(value) > -1;
 }
 
 trinityId = function(player1, player2, player3) {
@@ -754,7 +780,6 @@ trinityId = function(player1, player2, player3) {
 }
 
 updateTrinityStat = function(trinityMap, trinityId, goalsScored, goalsConceded) {
-    console.log('updateTrinityStat trinityId ', trinityId);
     var trinity = trinityMap.get(trinityId);
     if (trinity == null) {
     	trinity = {

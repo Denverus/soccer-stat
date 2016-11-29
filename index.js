@@ -175,8 +175,8 @@ app.get('/captains', function (request, response) {
     });
 });
 
-app.get('/trinity', function (request, response) {
-    gameTool.loadTrinityPageData('point', function (trinity) {
+app.get('/trinity/:size', function (request, response) {
+    gameTool.loadTrinityPageData(request.params.size, 'point', function (trinity) {
         console.log('Trinity', trinity);
         response.render('pages/trinity', {
             trinity: trinity,

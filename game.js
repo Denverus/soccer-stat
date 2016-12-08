@@ -86,6 +86,11 @@ module.exports = {
         loadCaptainsStat(order, function (captains) {
             response(captains);
         });
+    },
+    loadTrinityPageData: function (size, order, response) {
+        loadTrinityStat(size, order, function (trinity) {
+            response(trinity);
+        });
     }
 };
 
@@ -644,6 +649,56 @@ loadCaptainsStat = function (order, response) {
     });
 }
 
+loadTrinityStat = function (size, order, response) {
+    firebase.database.ref('/games').once('value').then(function (snapshot) {
+        var games = snapshot.val();
+
+        var trinityMap = new Map();
+
+        for (var gameProp in games) {
+            if (games.hasOwnProperty(gameProp)) {
+                var game = games[gameProp];
+                
+                var allColorTrinity = allTrinityFromSquad(game.color.squad, size);
+                var allWhiteTrinity = allTrinityFromSquad(game.white.squad, size);
+
+                for (var colorTrinity in allColorTrinity) {
+                	updateTrinityStat(trinityMap, allColorTrinity[colorTrinity], game.color.score, game.white.score);
+                }
+                for (var whiteTrinity in allWhiteTrinity) {
+                	updateTrinityStat(trinityMap, allWhiteTrinity[whiteTrinity], game.white.score, game.color.score);
+                }
+            }
+        }
+
+        var result = [];
+        trinityMap.forEach(function (value, key) {
+            // Points
+            value.points = value.wins * 3 + value.draws;
+            
+            var gamesCount = value.wins + value.draws + value.losses;
+            
+            // Wins percentage
+            winsPers = value.wins / gamesCount;
+            value.winsPers = Math.round(winsPers * 1000) / 1000;
+
+            // Scored per game
+            value.scoredPerGame = Math.round((value.scored * 100) / gamesCount) / 100;
+
+            // Conceded per game
+            value.concededPerGame = Math.round((value.conceded * 100) / gamesCount) / 100;
+
+            result.push(value);
+        });
+
+        result.sort(function (a, b) {
+            return b.points - a.points;
+        });
+
+        response(result);
+    });
+}
+
 updateCaptainStat = function(captainMap, captainId, goalsScored, goalsConceded) {
     var captain = captainMap.get(captainId);
     if (captain == null) {
@@ -669,61 +724,91 @@ updateCaptainStat = function(captainMap, captainId, goalsScored, goalsConceded) 
     captainMap.set(captainId, captain);
 }
 
-loadPlayerProfile2 = function (playerId, response) {
-    var player = {
-        name: 'denis',
-        summary: {
-            games: 2,
-            goals: 3,
-            asists: 1,
-            glas: 4,
-            wins: 2,
-            draws: 3,
-            losses: 1
-        },
-        games: [
-            {
-                num: 1,
-                date: '2016-10-24',
-                time: 100,
-                game: 'White - Color 2:5',
-                team: 'white',
-                win: 1,
-                goals: 2,
-                asists: 1,
-                glas: 3
-            },
-            {
-                num: 2,
-                date: '2016-10-31',
-                time: 0,
-                game: 'White - Color 5:2',
-            },
-            {
-                num: 3,
-                date: '2016-10-31',
-                time: 100,
-                game: 'White - Color 5:2',
-                win: 0,
-                team: 'color',
-                goals: 0,
-                asists: 1,
-                glas: 1
-            },
-            {
-                num: 4,
-                date: '2016-10-31',
-                time: 100,
-                game: 'White - Color 5:2',
-                win: -1,
-                team: 'color',
-                goals: 0,
-                asists: 1,
-                glas: 1
-            }
-        ]
-    };
-    response(player);
+allTrinityFromSquad = function(squad, size) {
+	var trinities = [];
+    for (var squadProp in squad) {
+        if (squad.hasOwnProperty(squadProp)) {
+            trinities.push(squadProp);
+        }
+    }
+    
+	var result = [];
+    /*for (var i=0; i<trinities.length; i++) {
+    	for (var j=i+1; j<trinities.length; j++) {
+        	for (var k=j+1; k<trinities.length; k++) {
+        		trinity = trinityId(trinities[i], trinities[j], trinities[k]);
+        		result.push(trinity);
+        	}
+    	}
+    }*/
+
+    doNestedLoop(trinities, [], 0, size, result);
+    
+	return result;
+}
+
+function doNestedLoop(squad, indexes, start, size, result) {
+    if (indexes.length < size) {
+        for (var i=start; i<squad.length; i++) {
+            indexes.push(i);
+            doNestedLoop(squad, indexes, i+1, size, result);
+            indexes.splice(indexes.length-1, 1);
+        }
+    } else {
+        var couple = [];
+        for (var i=0; i<indexes.length; i++) {
+            couple.push(squad[indexes[i]]);
+        }
+        couple.sort(function (a, b) {
+            return a.localeCompare(b);
+        });
+        console.log('New couple ', couple.toString());
+        result.push(couple.toString());
+    }
+}
+
+function isInArray(value, array) {
+    return array.indexOf(value) > -1;
+}
+
+trinityId = function(player1, player2, player3) {
+	var playerArray = [player1, player2, player3];
+    playerArray.sort(function (a, b) {
+        return a.localeCompare(b);
+    });
+    return playerArray[0]+'_'+playerArray[1]+'_'+playerArray[2];
+}
+
+updateTrinityStat = function(trinityMap, trinityId, goalsScored, goalsConceded) {
+    var trinity = trinityMap.get(trinityId);
+    if (trinity == null) {
+    	trinity = {
+            id: trinityId,
+            name: trinityId,
+            wins: 0,
+            draws: 0,
+            losses: 0,
+            scored: 0,
+            conceded: 0,
+            points: 0,
+            winsPers: 0,
+            scoredPerGame: 0,
+            concededPerGame: 0
+        };
+    }
+
+    trinity.scored = trinity.scored + goalsScored;
+    trinity.conceded = trinity.conceded + goalsConceded;
+    
+    if (goalsScored > goalsConceded) {
+    	trinity.wins ++;
+    } else if (goalsScored < goalsConceded) {
+    	trinity.losses ++;
+    } else if (goalsScored == goalsConceded) {
+    	trinity.draws ++;
+    }
+
+    trinityMap.set(trinityId, trinity);
 }
 
 asyncLoop = function asyncLoop(iterations, func, callback) {

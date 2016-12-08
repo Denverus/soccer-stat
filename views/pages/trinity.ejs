@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Russian Soccer stat - Winners</title>
+    <% include ../partials/header.ejs %>
+    <% include ../partials/counters.ejs %>
+</head>
+
+<body>
+
+<% include ../partials/nav.ejs %>
+
+<div id="main" class="container">
+
+    <div class="col-md-12 col-xs-12">
+        <div class="panel panel-primary">
+            <div class="panel-heading"><h3 class="panel-title">Trinity</h3></div>
+            <div class="panel-body">
+                <% var full_scorers = true; %>
+                <% include ../partials/trinity_list.ejs %>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>

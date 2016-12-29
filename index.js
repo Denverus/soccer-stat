@@ -91,6 +91,16 @@ app.get('/games', function (request, response) {
     });
 });
 
+app.get('/api/1.0/games', function (request, response) {
+    gameTool.loadGamesPageData(function (games) {
+        console.log('Games list ', games);
+        var data = {
+            games: games,
+            nav: getNavFor('/games')
+        };
+        response.end( JSON.stringify(data));
+    });
+});
 
 app.get('/game/:gameId', function (request, response) {
     gameTool.loadOneGamePageData(request.params.gameId, function (data) {
@@ -103,6 +113,17 @@ app.get('/game/:gameId', function (request, response) {
     });
 });
 
+app.get('/api/1.0/game/:gameId', function (request, response) {
+    gameTool.loadOneGamePageData(request.params.gameId, function (data) {
+        console.log('Single game ', data);
+        var data = {
+            game: data.game,
+            gameStat: data.gameStat,
+            nav: getNavFor('')
+        };
+        response.end( JSON.stringify(data));
+    });
+});
 
 app.get('/players', function (request, response) {
     gameTool.loadPlayersPageData('name', function (players) {
@@ -114,6 +135,17 @@ app.get('/players', function (request, response) {
     });
 });
 
+app.get('/api/1.0/players', function (request, response) {
+    gameTool.loadPlayersPageData('name', function (players) {
+        console.log('Player list ', players);
+        var data = {
+            players: players,
+            nav: getNavFor('/players')
+        };
+        response.end( JSON.stringify(data));
+    });
+});
+
 app.get('/scorers', function (request, response) {
     gameTool.loadPlayersPageData('goal', function (players) {
         console.log('Player list ', players);
@@ -121,6 +153,17 @@ app.get('/scorers', function (request, response) {
             scorers: players,
             nav: getNavFor('/scorers')
         });
+    });
+});
+
+app.get('/api/1.0/scorers', function (request, response) {
+    gameTool.loadPlayersPageData('goal', function (players) {
+        console.log('Player list ', players);
+        var data = {
+            scorers: players,
+            nav: getNavFor('/scorers')
+        };
+        response.end( JSON.stringify(data));
     });
 });
 
@@ -135,6 +178,17 @@ app.get('/assists', function (request, response) {
 });
 
 
+app.get('/api/1.0/assists', function (request, response) {
+    gameTool.loadPlayersPageData('assist', function (players) {
+        console.log('Player list ', players);
+        var data = {
+            assists: players,
+                nav: getNavFor('/assists')
+        };
+        response.end( JSON.stringify(data));
+    });
+});
+
 app.get('/glas', function (request, response) {
     gameTool.loadPlayersPageData('glas', function (players) {
         console.log('Player list ', players);
@@ -142,6 +196,17 @@ app.get('/glas', function (request, response) {
             glas: players,
             nav: getNavFor('/glas')
         });
+    });
+});
+
+app.get('/api/1.0/glas', function (request, response) {
+    gameTool.loadPlayersPageData('glas', function (players) {
+        console.log('Player list ', players);
+        var data = {
+            glas: players,
+            nav: getNavFor('/glas')
+        };
+        response.end( JSON.stringify(data));
     });
 });
 
@@ -155,6 +220,17 @@ app.get('/player/:playerId', function (request, response) {
     });
 });
 
+app.get('/api/1.0/player/:playerId', function (request, response) {
+    gameTool.loadPlayerProfilePageData(request.params.playerId, function (player) {
+        console.log('Player profile ', player);
+        var data = {
+            player: player,
+            nav: getNavFor('')
+        };
+        response.end( JSON.stringify(data));
+    });
+});
+
 app.get('/winners', function (request, response) {
     gameTool.loadWinnersPageData('point', function (winners) {
         console.log('Winners', winners);
@@ -162,6 +238,17 @@ app.get('/winners', function (request, response) {
         	winners: winners,
             nav: getNavFor('/winners')
         });
+    });
+});
+
+app.get('/api/1.0/winners', function (request, response) {
+    gameTool.loadWinnersPageData('point', function (winners) {
+        console.log('Winners', winners);
+        var data = {
+            winners: winners,
+            nav: getNavFor('/winners')
+        };
+        response.end( JSON.stringify(data));
     });
 });
 
@@ -175,6 +262,17 @@ app.get('/captains', function (request, response) {
     });
 });
 
+app.get('/api/1.0/captains', function (request, response) {
+    gameTool.loadCaptainsPageData('point', function (captains) {
+        console.log('Captains', captains);
+        var data = {
+            captains: captains,
+            nav: getNavFor('/captains')
+        };
+        response.end( JSON.stringify(data));
+    });
+});
+
 app.get('/trinity/:size', function (request, response) {
     gameTool.loadTrinityPageData(request.params.size, 'point', function (trinity) {
         console.log('Trinity', trinity);
@@ -182,6 +280,17 @@ app.get('/trinity/:size', function (request, response) {
             trinity: trinity,
             nav: getNavFor('')
         });
+    });
+});
+
+app.get('/api/1.0/trinity/:size', function (request, response) {
+    gameTool.loadTrinityPageData(request.params.size, 'point', function (trinity) {
+        console.log('Trinity', trinity);
+        var data = {
+            trinity: trinity,
+            nav: getNavFor('')
+        };
+        response.end( JSON.stringify(data));
     });
 });
 

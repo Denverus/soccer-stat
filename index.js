@@ -81,6 +81,22 @@ app.get('/', function (request, response) {
     });
 });
 
+app.get('/api/1.0/index', function (request, response) {
+    gameTool.loadGamesPageData(function (games) {
+        var data = {
+            lastGame: data.lastGame,
+            games: data.gameList,
+            scorers: data.scorers,
+            assists: data.assists,
+            glas: data.glas,
+            winners: data.winners,
+            captains: data.captains
+        };
+        console.log('Games list ', data);
+        response.end( JSON.stringify(data));
+    });
+});
+
 app.get('/games', function (request, response) {
     gameTool.loadGamesPageData(function (games) {
         console.log('Games list ', games);
@@ -94,11 +110,7 @@ app.get('/games', function (request, response) {
 app.get('/api/1.0/games', function (request, response) {
     gameTool.loadGamesPageData(function (games) {
         console.log('Games list ', games);
-        var data = {
-            games: games,
-            nav: getNavFor('/games')
-        };
-        response.end( JSON.stringify(data));
+        response.end( JSON.stringify(games));
     });
 });
 

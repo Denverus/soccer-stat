@@ -9,7 +9,7 @@
     </thead>
     <tbody>
     <% var max = 5; %>
-    <% if (full_scorers) { %>
+    <% if (full_scorers || max > scorers.length) { %>
     <% max = scorers.length; %>
     <% } %>
     <% for(var i = 0; i < max; i++) { %>

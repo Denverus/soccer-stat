@@ -68,19 +68,20 @@ getNavFor = function(url) {
 app.get('/', function (request, response) {
     var year = new Date().getFullYear();
     gameTool.loadIndexPageData(year, function (data) {
-        console.log('Index page data ', data.gameList);
-        response.render('pages/index', {
-            lastGame: data.lastGame,
-            games: data.gameList,
-            scorers: data.scorers,
-            assists: data.assists,
-            glas: data.glas,
-            winners: data.winners,
-            captains: data.captains,
-            years: data.years,
-            currentYear: year,
-            nav: getNavFor('/')
-        });
+        var uiData = {
+                lastGame: data.lastGame,
+                games: data.gameList,
+                scorers: data.scorers,
+                assists: data.assists,
+                glas: data.glas,
+                winners: data.winners,
+                captains: data.captains,
+                years: data.years,
+                currentYear: year,
+                nav: getNavFor('/')
+            };
+        console.log('Index page data ', uiData);
+        response.render('pages/index', uiData);
     });
 });
 
@@ -97,6 +98,7 @@ app.get('/year/:year', function (request, response) {
             winners: data.winners,
             captains: data.captains,
             years: data.years,
+            currentYear: year,
             nav: getNavFor('/')
         });
     });
@@ -118,11 +120,14 @@ app.get('/api/1.0/index', function (request, response) {
     });
 });
 
-app.get('/games', function (request, response) {
-    gameTool.loadGamesPageData(function (games) {
-        console.log('Games list ', games);
+app.get('/games/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadGamesPageData(year, function (data) {
+        console.log('Games list ', data);
         response.render('pages/games', {
-            games: games,
+            games: data.games,
+            years: data.years,
+            currentYear: year,
             nav: getNavFor('/games')
         });
     });

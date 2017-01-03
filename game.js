@@ -19,27 +19,27 @@ module.exports = {
                     });
                 },
                 scorers: function (callback) {
-                    loadAllPlayersStat('goal', function (players) {
+                    loadAllPlayersStat(year, 'goal', function (players) {
                         callback(null, players);
                     });
                 },
                 assists: function (callback) {
-                    loadAllPlayersStat('assist', function (players) {
+                    loadAllPlayersStat(year, 'assist', function (players) {
                         callback(null, players);
                     });
                 },
                 glas: function (callback) {
-                    loadAllPlayersStat('glas', function (players) {
+                    loadAllPlayersStat(year, 'glas', function (players) {
                         callback(null, players);
                     });
                 },
                 winners: function (callback) {
-                    loadWinners('record', function (winners) {
+                    loadWinners(year, 'record', function (winners) {
                         callback(null, winners);
                     });
                 },
                 captains: function (callback) {
-                    loadCaptainsStat('record', function (captains) {
+                    loadCaptainsStat(year, 'record', function (captains) {
                         callback(null, captains);
                     });
                 },
@@ -54,9 +54,20 @@ module.exports = {
         });
     },
     loadGamesPageData: function (response) {
-        loadAllGames(function (games) {
-            response(games);
-        });
+    	async.series({
+            games: function (callback) {
+            	loadAllGames(year, function (games) {
+                    callback(null, games);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
+                });
+            }
+        }, function (err, results) {
+            response(results);
+        });    	
     },
     loadOneGamePageData: function (year, gameId, response) {
         async.series({
@@ -401,8 +412,8 @@ loadAllPlayersStat = function (year, order, response) {
     });
 }
 
-loadPlayerProfile = function (playerId, response) {
-    firebase.database.ref('/games').once('value').then(function (snapshot) {
+loadPlayerProfile = function (year, playerId, response) {
+    firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
         var games = snapshot.val();
         var player = {
             name: playerId,
@@ -560,8 +571,8 @@ calcGameAttendanceStat = function (playerId, squadTime, squad, teamname, opposit
     }
 }
 
-loadWinners = function (order, response) {
-    firebase.database.ref('/games').once('value').then(function (snapshot) {
+loadWinners = function (year, order, response) {
+    firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
         var games = snapshot.val();
 
         var playerMap = new Map();
@@ -662,8 +673,8 @@ calcGameWinnerStat = function (playerId, squadTime, squad, teamname, oppositeTea
     }
 }
 
-loadCaptainsStat = function (order, response) {
-    firebase.database.ref('/games').once('value').then(function (snapshot) {
+loadCaptainsStat = function (year, order, response) {
+    firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
         var games = snapshot.val();
 
         var captainMap = new Map();

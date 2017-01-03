@@ -66,8 +66,9 @@ getNavFor = function(url) {
 };
 
 app.get('/', function (request, response) {
-    gameTool.loadIndexPageData(function (data) {
-        console.log('Index page data ', data);
+    var year = new Date().getFullYear();
+    gameTool.loadIndexPageData(year, function (data) {
+        console.log('Index page data ', data.gameList);
         response.render('pages/index', {
             lastGame: data.lastGame,
             games: data.gameList,
@@ -76,6 +77,26 @@ app.get('/', function (request, response) {
             glas: data.glas,
             winners: data.winners,
             captains: data.captains,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor('/')
+        });
+    });
+});
+
+app.get('/year/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadIndexPageData(year, function (data) {
+        console.log('Index page data ', data.gameList);
+        response.render('pages/index', {
+            lastGame: data.lastGame,
+            games: data.gameList,
+            scorers: data.scorers,
+            assists: data.assists,
+            glas: data.glas,
+            winners: data.winners,
+            captains: data.captains,
+            years: data.years,
             nav: getNavFor('/')
         });
     });
@@ -114,12 +135,13 @@ app.get('/api/1.0/games', function (request, response) {
     });
 });
 
-app.get('/game/:gameId', function (request, response) {
-    gameTool.loadOneGamePageData(request.params.gameId, function (data) {
+app.get('/game/:year/:gameId', function (request, response) {
+    gameTool.loadOneGamePageData(request.params.year, request.params.gameId, function (data) {
         console.log('Single game ', data);
         response.render('pages/single_game', {
             game: data.game,
             gameStat: data.gameStat,
+            years: data.years,
             nav: getNavFor('')
         });
     });
@@ -158,11 +180,13 @@ app.get('/api/1.0/players', function (request, response) {
     });
 });
 
-app.get('/scorers', function (request, response) {
-    gameTool.loadPlayersPageData('goal', function (players) {
-        console.log('Player list ', players);
+app.get('/scorers/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadPlayersPageData(year, 'goal', function (data) {
+        console.log('Player list ', data);
         response.render('pages/scorers', {
-            scorers: players,
+            scorers: data.stat,
+            years: data.years,
             nav: getNavFor('/scorers')
         });
     });

@@ -1,18 +1,20 @@
 var firebase = require('./firebase');
 var async = require('async');
 
+var games_brunch = '/games_new';
+
 module.exports = {
 
-    loadIndexPageData: function (response) {
-        loadConfig(function (config) {
+    loadIndexPageData: function (year, response) {
+        loadLastGameId(year, function (lastGameId) {
             async.series({
                 lastGame: function (callback) {
-                    loadFullGame(config.lastgame, function (game) {
+                    loadFullGame(year, lastGameId, function (game) {
                         callback(null, game);
                     });
                 },
                 gameList: function (callback) {
-                    loadAllGames(function (allGames) {
+                    loadAllGames(year, function (allGames) {
                         callback(null, allGames);
                     });
                 },
@@ -40,6 +42,11 @@ module.exports = {
                     loadCaptainsStat('record', function (captains) {
                         callback(null, captains);
                     });
+                },
+                years: function (callback) {
+                    getListOfYears(function (years) {
+                        callback(null, years);
+                    });
                 }
             }, function (err, results) {
                 response(results);
@@ -51,25 +58,41 @@ module.exports = {
             response(games);
         });
     },
-    loadOneGamePageData: function (gameId, response) {
+    loadOneGamePageData: function (year, gameId, response) {
         async.series({
             game: function (callback) {
-                loadOneGame(gameId, function (game) {
+                loadOneGame(year, gameId, function (game) {
                     callback(null, game);
                 });
             },
             gameStat: function (callback) {
-                loadFullGame(gameId, function (game) {
+                loadFullGame(year, gameId, function (game) {
                     callback(null, game);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
                 });
             }
         }, function (err, results) {
             response(results);
         });
     },
-    loadPlayersPageData: function (order, response) {
-        loadAllPlayersStat(order, function (players) {
-            response(players);
+    loadPlayersPageData: function (year, order, response) {
+        async.series({
+            stat: function (callback) {
+                loadAllPlayersStat(year, order, function (players) {
+                    callback(null, players);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
+                });
+            }
+        }, function (err, results) {
+            response(results);
         });
     },
     loadPlayerProfilePageData: function (playerId, response) {
@@ -78,7 +101,7 @@ module.exports = {
         });
     },
     loadWinnersPageData: function (order, response) {
-    	loadWinners(order, function (winners) {
+        loadWinners(order, function (winners) {
             response(winners);
         });
     },
@@ -92,35 +115,35 @@ module.exports = {
             response(trinity);
         });
     },
-    copyEvents: function() {
+    copyEvents: function () {
         //copyEvents();
     }
 };
 
-loadFullGame = function (gameId, response) {
+loadFullGame = function (year, gameId, response) {
     async.series({
         game: function (callback) {
-            loadOneGame(gameId, function (game) {
+            loadOneGame(year, gameId, function (game) {
                 callback(null, game);
             });
         },
         score: function (callback) {
-            loadScore(gameId, function (score) {
+            loadScore(year, gameId, function (score) {
                 callback(null, score);
             });
         },
         white: function (callback) {
-            loadSquad(gameId, true, function (squad) {
+            loadSquad(year, gameId, true, function (squad) {
                 callback(null, squad);
             });
         },
         color: function (callback) {
-            loadSquad(gameId, false, function (squad) {
+            loadSquad(year, gameId, false, function (squad) {
                 callback(null, squad);
             });
         },
         events: function (callback) {
-            loadEvents(gameId, function (squad) {
+            loadEvents(year, gameId, function (squad) {
                 callback(null, squad);
             });
         }
@@ -135,8 +158,31 @@ loadConfig = function (response) {
     });
 }
 
-loadOneGame = function (gameId, response) {
-    firebase.database.ref('/games/' + gameId).once('value').then(function (snapshot) {
+loadLastGameId = function (year, response) {
+    firebase.database.ref(games_brunch + '/'+year).once('value').then(function (snapshot) {
+        var games = snapshot.val();
+        var gamesIndexArray = Object.keys(games);
+        var gamesArray = [];
+        for (var gameKey in gamesIndexArray) {
+            var gameId = gamesIndexArray[gameKey];
+            var game = games[gameId];
+            game.year = year;
+            game.id = gameId;
+            gamesArray.push(game);
+        }
+        gamesArray.sort(function (a, b) {
+            return b.id.localeCompare(a.id);
+        });
+        if (gamesArray.length > 0) {
+            response(gamesArray[0].id);
+        } else {
+            response(null);
+        }
+    });
+}
+
+loadOneGame = function (year, gameId, response) {
+    firebase.database.ref(games_brunch + '/'+year + '/' + gameId).once('value').then(function (snapshot) {
         var game = snapshot.val();
         game.id = gameId;
         response(game);
@@ -160,8 +206,8 @@ loadGameShort = function (gameId, response) {
     });
 }
 
-loadScore = function (gameId, response) {
-    firebase.database.ref('/games/' + gameId).once('value').then(function (snapshot) {
+loadScore = function (year, gameId, response) {
+    firebase.database.ref(games_brunch + '/' + year + '/' + gameId).once('value').then(function (snapshot) {
         var game = snapshot.val();
         var score = {
             color: game.color.score,
@@ -171,20 +217,20 @@ loadScore = function (gameId, response) {
     });
 }
 
-loadDate = function (gameId, response) {
-    firebase.database.ref('/games/' + gameId).once('value').then(function (snapshot) {
+loadDate = function (year, gameId, response) {
+    firebase.database.ref(games_brunch + '/' + year + '/' + gameId).once('value').then(function (snapshot) {
         var game = snapshot.val();
         response(game.date);
     });
 }
 
-loadSquad = function (gameId, white, response) {
+loadSquad = function (year, gameId, white, response) {
     var team = 'color';
     if (white) {
         team = 'white';
     }
     ;
-    firebase.database.ref('/games/' + gameId + '/' + team + '/squad').once('value').then(function (snapshot) {
+    firebase.database.ref(games_brunch + '/' + year + '/' + gameId + '/' + team + '/squad').once('value').then(function (snapshot) {
         var squad = snapshot.val();
         var dataArray = new Array;
         for (var o in squad) {
@@ -196,8 +242,8 @@ loadSquad = function (gameId, white, response) {
 }
 
 
-loadEvents = function (gameId, response) {
-    firebase.database.ref('/games/' + gameId + '/events').once('value').then(function (snapshot) {
+loadEvents = function (year, gameId, response) {
+    firebase.database.ref(games_brunch + '/' + year + '/' + gameId + '/events').once('value').then(function (snapshot) {
         var events = snapshot.val();
         var dataArray = new Array;
         for (var o in events) {
@@ -214,8 +260,9 @@ loadPlayer = function (playerid, response) {
     });
 }
 
-loadAllGames = function (response) {
-    firebase.database.ref('/games').once('value').then(function (snapshot) {
+loadAllGames = function (year, response) {
+    //firebase.database.ref('/games').once('value').then(function (snapshot) {
+    firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
         var games = snapshot.val();
         var gamesArray = [];
 
@@ -223,6 +270,7 @@ loadAllGames = function (response) {
         for (var gameKey in gamesIndexArray) {
             var gameId = gamesIndexArray[gameKey];
             var game = games[gameId];
+            game.year = year;
             game.id = gameId;
             game.playersCount = calcPlayerCount(game);
             gamesArray.push(game);
@@ -234,7 +282,7 @@ loadAllGames = function (response) {
     });
 }
 
-calcPlayerCount = function(game) {
+calcPlayerCount = function (game) {
     if (game.color.squad == null || game.white.squad == null) {
         return null;
     }
@@ -290,8 +338,8 @@ calcPlayerAppereance = function (playerMap, squad) {
     }
 }
 
-loadAllPlayersStat = function (order, response) {
-    firebase.database.ref('/games').once('value').then(function (snapshot) {
+loadAllPlayersStat = function (year, order, response) {
+    firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
         var games = snapshot.val();
         var playerArray = [];
         var playerMap = new Map();
@@ -529,7 +577,7 @@ loadWinners = function (order, response) {
 
                 for (var index in players) {
 
-                	var playerId = players[index];
+                    var playerId = players[index];
                     var player = playerMap.get(playerId);
                     if (player == null) {
                         player = {
@@ -550,36 +598,36 @@ loadWinners = function (order, response) {
 
                     if (squadTime.color > squadTime.white) {
                         if (game.color.score > game.white.score) {
-                            player.wins ++;
+                            player.wins++;
                         } else if (game.color.score < game.white.score) {
-                            player.losses ++;
+                            player.losses++;
                         } else if (game.color.score == game.white.score) {
-                            player.draws ++;
+                            player.draws++;
                         }
                     } else {
                         if (game.color.score < game.white.score) {
-                            player.wins ++;
+                            player.wins++;
                         } else if (game.color.score > game.white.score) {
-                            player.losses ++;
+                            player.losses++;
                         } else if (game.color.score == game.white.score) {
-                            player.draws ++;
+                            player.draws++;
                         }
                     }
-                    
+
                     playerMap.set(playerId, player);
-                    
+
                 }
             }
         }
 
         var result = [];
         playerMap.forEach(function (value, key) {
-        	// Points
+            // Points
             value.points = value.wins * 3 + value.draws;
             // Wins percentage
             winsPers = value.wins / (value.wins + value.draws + value.losses);
             value.winsPers = Math.round(winsPers * 1000) / 1000;
-            
+
             result.push(value);
         });
 
@@ -661,15 +709,15 @@ loadTrinityStat = function (size, order, response) {
         for (var gameProp in games) {
             if (games.hasOwnProperty(gameProp)) {
                 var game = games[gameProp];
-                
+
                 var allColorTrinity = allTrinityFromSquad(game.color.squad, size);
                 var allWhiteTrinity = allTrinityFromSquad(game.white.squad, size);
 
                 for (var colorTrinity in allColorTrinity) {
-                	updateTrinityStat(trinityMap, allColorTrinity[colorTrinity], game.color.score, game.white.score);
+                    updateTrinityStat(trinityMap, allColorTrinity[colorTrinity], game.color.score, game.white.score);
                 }
                 for (var whiteTrinity in allWhiteTrinity) {
-                	updateTrinityStat(trinityMap, allWhiteTrinity[whiteTrinity], game.white.score, game.color.score);
+                    updateTrinityStat(trinityMap, allWhiteTrinity[whiteTrinity], game.white.score, game.color.score);
                 }
             }
         }
@@ -678,9 +726,9 @@ loadTrinityStat = function (size, order, response) {
         trinityMap.forEach(function (value, key) {
             // Points
             value.points = value.wins * 3 + value.draws;
-            
+
             var gamesCount = value.wins + value.draws + value.losses;
-            
+
             // Wins percentage
             winsPers = value.wins / gamesCount;
             value.winsPers = Math.round(winsPers * 1000) / 1000;
@@ -702,7 +750,7 @@ loadTrinityStat = function (size, order, response) {
     });
 }
 
-updateCaptainStat = function(captainMap, captainId, goalsScored, goalsConceded) {
+updateCaptainStat = function (captainMap, captainId, goalsScored, goalsConceded) {
     var captain = captainMap.get(captainId);
     if (captain == null) {
         captain = {
@@ -716,50 +764,50 @@ updateCaptainStat = function(captainMap, captainId, goalsScored, goalsConceded) 
         };
     }
 
-        if (goalsScored > goalsConceded) {
-            captain.wins ++;
-        } else if (goalsScored < goalsConceded) {
-            captain.losses ++;
-        } else if (goalsScored == goalsConceded) {
-            captain.draws ++;
-        }
+    if (goalsScored > goalsConceded) {
+        captain.wins++;
+    } else if (goalsScored < goalsConceded) {
+        captain.losses++;
+    } else if (goalsScored == goalsConceded) {
+        captain.draws++;
+    }
 
     captainMap.set(captainId, captain);
 }
 
-allTrinityFromSquad = function(squad, size) {
-	var trinities = [];
+allTrinityFromSquad = function (squad, size) {
+    var trinities = [];
     for (var squadProp in squad) {
         if (squad.hasOwnProperty(squadProp)) {
             trinities.push(squadProp);
         }
     }
-    
-	var result = [];
+
+    var result = [];
     /*for (var i=0; i<trinities.length; i++) {
-    	for (var j=i+1; j<trinities.length; j++) {
-        	for (var k=j+1; k<trinities.length; k++) {
-        		trinity = trinityId(trinities[i], trinities[j], trinities[k]);
-        		result.push(trinity);
-        	}
-    	}
-    }*/
+     for (var j=i+1; j<trinities.length; j++) {
+     for (var k=j+1; k<trinities.length; k++) {
+     trinity = trinityId(trinities[i], trinities[j], trinities[k]);
+     result.push(trinity);
+     }
+     }
+     }*/
 
     doNestedLoop(trinities, [], 0, size, result);
-    
-	return result;
+
+    return result;
 }
 
 function doNestedLoop(squad, indexes, start, size, result) {
     if (indexes.length < size) {
-        for (var i=start; i<squad.length; i++) {
+        for (var i = start; i < squad.length; i++) {
             indexes.push(i);
-            doNestedLoop(squad, indexes, i+1, size, result);
-            indexes.splice(indexes.length-1, 1);
+            doNestedLoop(squad, indexes, i + 1, size, result);
+            indexes.splice(indexes.length - 1, 1);
         }
     } else {
         var couple = [];
-        for (var i=0; i<indexes.length; i++) {
+        for (var i = 0; i < indexes.length; i++) {
             couple.push(squad[indexes[i]]);
         }
         couple.sort(function (a, b) {
@@ -774,18 +822,18 @@ function isInArray(value, array) {
     return array.indexOf(value) > -1;
 }
 
-trinityId = function(player1, player2, player3) {
-	var playerArray = [player1, player2, player3];
+trinityId = function (player1, player2, player3) {
+    var playerArray = [player1, player2, player3];
     playerArray.sort(function (a, b) {
         return a.localeCompare(b);
     });
-    return playerArray[0]+'_'+playerArray[1]+'_'+playerArray[2];
+    return playerArray[0] + '_' + playerArray[1] + '_' + playerArray[2];
 }
 
-updateTrinityStat = function(trinityMap, trinityId, goalsScored, goalsConceded) {
+updateTrinityStat = function (trinityMap, trinityId, goalsScored, goalsConceded) {
     var trinity = trinityMap.get(trinityId);
     if (trinity == null) {
-    	trinity = {
+        trinity = {
             id: trinityId,
             name: trinityId,
             wins: 0,
@@ -802,16 +850,28 @@ updateTrinityStat = function(trinityMap, trinityId, goalsScored, goalsConceded) 
 
     trinity.scored = trinity.scored + goalsScored;
     trinity.conceded = trinity.conceded + goalsConceded;
-    
+
     if (goalsScored > goalsConceded) {
-    	trinity.wins ++;
+        trinity.wins++;
     } else if (goalsScored < goalsConceded) {
-    	trinity.losses ++;
+        trinity.losses++;
     } else if (goalsScored == goalsConceded) {
-    	trinity.draws ++;
+        trinity.draws++;
     }
 
     trinityMap.set(trinityId, trinity);
+}
+
+getListOfYears = function (response) {
+    firebase.database.ref(games_brunch).once('value').then(function (snapshot) {
+
+        var years = [];
+        var games = snapshot.val();
+        for (var yearProp in games) {
+            years.push(yearProp);
+        }
+        response(years);
+    });
 }
 
 asyncLoop = function asyncLoop(iterations, func, callback) {
@@ -848,14 +908,16 @@ asyncLoop = function asyncLoop(iterations, func, callback) {
 
 
 function copyFbRecord(oldRef, newRef) {
-    oldRef.once('value', function(snap)  {
-        newRef.set( snap.val(), function(error) {
-            if( error && typeof(console) !== 'undefined' && console.error ) {  console.error(error); }
+    oldRef.once('value', function (snap) {
+        newRef.set(snap.val(), function (error) {
+            if (error && typeof(console) !== 'undefined' && console.error) {
+                console.error(error);
+            }
         });
     });
 };
 
-copyEvents = function() {
+copyEvents = function () {
     var fromRef = firebase.database.ref('games/');
     var toRef = firebase.database.ref('games_new/2016');
     //copyFbRecord(fromRef, toRef);

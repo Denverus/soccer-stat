@@ -1,7 +1,7 @@
 <ul class="list-group">
 
     <% var max = 5; %>
-    <% if (full) { %>
+    <% if (full || max > games.length) { %>
     <% max = games.length; %>
     <% } %>
 
@@ -16,7 +16,7 @@
 
     <li class="list-group-item">
         <span class="badge"><%= games[i].date %></span>
-        <a href="/game/<%= games[i].id %> ">
+        <a href="/game/<%= games[i].year %>/<%= games[i].id %> ">
         <%if (whiteWon > 0) { %>
         <b>White</b>
         <% } else { %>

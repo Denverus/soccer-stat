@@ -321,3 +321,6 @@ var config = {
     storageBucket: "russian-soccer.appspot.com",
     messagingSenderId: "476867980667"
 };
+
+
+gameTool.copyEvents();

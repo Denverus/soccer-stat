@@ -91,6 +91,9 @@ module.exports = {
         loadTrinityStat(size, order, function (trinity) {
             response(trinity);
         });
+    },
+    copyEvents: function() {
+        //copyEvents();
     }
 };
 
@@ -841,4 +844,19 @@ asyncLoop = function asyncLoop(iterations, func, callback) {
     };
     loop.next();
     return loop;
+}
+
+
+function copyFbRecord(oldRef, newRef) {
+    oldRef.once('value', function(snap)  {
+        newRef.set( snap.val(), function(error) {
+            if( error && typeof(console) !== 'undefined' && console.error ) {  console.error(error); }
+        });
+    });
+};
+
+copyEvents = function() {
+    var fromRef = firebase.database.ref('games/');
+    var toRef = firebase.database.ref('games_new/2016');
+    //copyFbRecord(fromRef, toRef);
 }

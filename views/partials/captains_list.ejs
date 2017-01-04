@@ -12,13 +12,13 @@
     </thead>
     <tbody>
     <% var max = 5; %>
-    <% if (full_scorers) { %>
+    <% if (full_scorers || max > captains.length) { %>
     <% max = captains.length; %>
     <% } %>
     <% for(var i = 0; i < max; i++) { %>
     <tr>
         <th scope="row"><%= i + 1 %></th>
-        <td><a href="/player/<%= captains[i].id %>"><%= captains[i].name %></a></td>
+        <td><a href="/player/<%= captains[i].id %>/<%= currentYear %>"><%= captains[i].name %></a></td>
         <td><%= captains[i].wins %>-<%= captains[i].draws %>-<%= captains[i].losses %></td>
 	    <% if (full_scorers) { %>
 	    <td><%= captains[i].winsPers %></td>

@@ -9,13 +9,13 @@
     </thead>
     <tbody>
     <% var max = 5; %>
-    <% if (full_scorers) { %>
+    <% if (full_scorers || max > glas.length) { %>
     <% max = glas.length; %>
     <% } %>
     <% for(var i = 0; i < max; i++) { %>
     <tr>
         <th scope="row"><%= i + 1 %></th>
-        <td><a href="/player/<%= glas[i].name %>"><%= glas[i].name %></a></td>
+        <td><a href="/player/<%= glas[i].name %>/<%= currentYear %>"><%= glas[i].name %></a></td>
         <td><%= glas[i].glas %></td>
         <td><%= glas[i].games %></td>
     </tr>

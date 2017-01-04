@@ -367,19 +367,29 @@ createPlayerStatObj = function (playerProp) {
     return player;
 }
 
-calcPlayerAppereance = function (playerMap, squad) {
-    for (var playerProp in squad) {
-        if (squad.hasOwnProperty(playerProp)) {
-            var player = playerMap.get(playerProp);
-            if (player != null) {
-                player.games++;
-            } else {
-                var player = createPlayerStatObj(playerProp);
-                player.games = 1;
-                playerMap.set(playerProp, player);
-            }
+calcPlayerAppereance = function (playerMap, squad1, squad2) {
+    var tmpMap = new Map();
+    for (var playerProp in squad1) {
+        if (squad1.hasOwnProperty(playerProp)) {
+            tmpMap.set(playerProp, playerProp);
         }
     }
+    for (var playerProp in squad2) {
+        if (squad2.hasOwnProperty(playerProp)) {
+            tmpMap.set(playerProp, playerProp);
+        }
+    }
+
+    tmpMap.forEach(function (value, key, map) {
+        var player = playerMap.get(key);
+        if (player != null) {
+            player.games++;
+        } else {
+            var player = createPlayerStatObj(key);
+            player.games = 1;
+            playerMap.set(key, player);
+        }
+    });
 }
 
 loadAllPlayersStat = function (year, order, response) {
@@ -392,8 +402,12 @@ loadAllPlayersStat = function (year, order, response) {
             if (games.hasOwnProperty(gameProp)) {
                 var game = games[gameProp];
 
-                calcPlayerAppereance(playerMap, game.color.squad);
-                calcPlayerAppereance(playerMap, game.white.squad);
+                var playerNoDublicates = new Map();
+
+                //squadsToPlayerMap(playerNoDublicates, game.color.squad, game.white.squad);
+                //console.log('playerNoDublicates =' + playerNoDublicates.keys());
+
+                calcPlayerAppereance(playerMap, game.color.squad, game.white.squad);
 
                 var events = game.events;
                 for (var eventProp in events) {

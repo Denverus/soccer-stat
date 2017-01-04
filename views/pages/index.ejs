@@ -22,7 +22,7 @@
                 <% var colorScore = game.score.color; %>
                 <% include ../partials/game_short_display.ejs %>
             </div>
-            <div class="panel-footer"><a href="/game/<%= lastGame.game.id %>" class="navbar-link">Full report</a></div>
+            <div class="panel-footer"><a href="/game/<%= currentYear %>/<%= lastGame.game.id %>" class="navbar-link">Full report</a></div>
         </div>
     </div>
     

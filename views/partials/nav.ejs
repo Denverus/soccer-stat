@@ -16,7 +16,7 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><%= currentYear %><span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <% for (var i = 0; i < years.length; i++) { %>
-                        <li><a href="/year/<%= years[i] %>"><%= years[i] %></a></li>
+                        <li><a href="<%= url %>/<%= years[i] %>"><%= years[i] %></a></li>
                         <% } %>
                     </ul>
                 </li>

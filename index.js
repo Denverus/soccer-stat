@@ -78,7 +78,8 @@ app.get('/', function (request, response) {
                 captains: data.captains,
                 years: data.years,
                 currentYear: year,
-                nav: getNavFor('/')
+                nav: getNavFor('/'),
+                url: '/'
             };
         console.log('Index page data ', uiData);
         response.render('pages/index', uiData);
@@ -99,7 +100,8 @@ app.get('/year/:year', function (request, response) {
             captains: data.captains,
             years: data.years,
             currentYear: year,
-            nav: getNavFor('/')
+            nav: getNavFor('/'),
+            url: '/'
         });
     });
 });
@@ -128,7 +130,8 @@ app.get('/games/:year', function (request, response) {
             games: data.games,
             years: data.years,
             currentYear: year,
-            nav: getNavFor('/games')
+            nav: getNavFor('/games'),
+            url: '/games'
         });
     });
 });
@@ -141,13 +144,17 @@ app.get('/api/1.0/games', function (request, response) {
 });
 
 app.get('/game/:year/:gameId', function (request, response) {
-    gameTool.loadOneGamePageData(request.params.year, request.params.gameId, function (data) {
+    var gameId = request.params.gameId;
+    var year = request.params.year;
+    gameTool.loadOneGamePageData(year, gameId, function (data) {
         console.log('Single game ', data);
         response.render('pages/single_game', {
             game: data.game,
             gameStat: data.gameStat,
             years: data.years,
-            nav: getNavFor('')
+            currentYear: year,
+            nav: getNavFor(''),
+            url: '/games'
         });
     });
 });
@@ -164,12 +171,16 @@ app.get('/api/1.0/game/:gameId', function (request, response) {
     });
 });
 
-app.get('/players', function (request, response) {
-    gameTool.loadPlayersPageData('name', function (players) {
-        console.log('Player list ', players);
+app.get('/players/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadPlayersPageData(year, 'name', function (data) {
+        console.log('Player list ', data);
         response.render('pages/players', {
-            players: players,
-            nav: getNavFor('/players')
+            players: data.stat,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor('/players'),
+            url: '/players'
         });
     });
 });
@@ -192,13 +203,16 @@ app.get('/scorers/:year', function (request, response) {
         response.render('pages/scorers', {
             scorers: data.stat,
             years: data.years,
-            nav: getNavFor('/scorers')
+            currentYear: year,
+            nav: getNavFor('/scorers'),
+            url: '/scorers'
         });
     });
 });
 
-app.get('/api/1.0/scorers', function (request, response) {
-    gameTool.loadPlayersPageData('goal', function (players) {
+app.get('/api/1.0/scorers/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadPlayersPageData(year, 'goal', function (players) {
         console.log('Player list ', players);
         var data = {
             scorers: players,
@@ -208,12 +222,16 @@ app.get('/api/1.0/scorers', function (request, response) {
     });
 });
 
-app.get('/assists', function (request, response) {
-    gameTool.loadPlayersPageData('assist', function (players) {
-        console.log('Player list ', players);
+app.get('/assists/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadPlayersPageData(year, 'assist', function (data) {
+        console.log('Player list ', data);
         response.render('pages/assists', {
-            assists: players,
-            nav: getNavFor('/assists')
+            assists: data.stat,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor('/assists'),
+            url: '/assists'
         });
     });
 });
@@ -230,12 +248,16 @@ app.get('/api/1.0/assists', function (request, response) {
     });
 });
 
-app.get('/glas', function (request, response) {
-    gameTool.loadPlayersPageData('glas', function (players) {
-        console.log('Player list ', players);
+app.get('/glas/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadPlayersPageData(year, 'glas', function (data) {
+        console.log('Player list ', data);
         response.render('pages/glas', {
-            glas: players,
-            nav: getNavFor('/glas')
+            glas: data.stat,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor('/glas'),
+            url: '/glas'
         });
     });
 });
@@ -251,12 +273,17 @@ app.get('/api/1.0/glas', function (request, response) {
     });
 });
 
-app.get('/player/:playerId', function (request, response) {
-    gameTool.loadPlayerProfilePageData(request.params.playerId, function (player) {
-        console.log('Player profile ', player);
+app.get('/player/:playerId/:year', function (request, response) {
+    var playerId = request.params.playerId;
+    var year = request.params.year;
+    gameTool.loadPlayerProfilePageData(year, playerId, function (data) {
+        console.log('Player profile ', data);
         response.render('pages/player', {
-            player: player,
-            nav: getNavFor('')
+            player: data.player,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor(''),
+            url: '/player/'+playerId
         });
     });
 });
@@ -272,12 +299,16 @@ app.get('/api/1.0/player/:playerId', function (request, response) {
     });
 });
 
-app.get('/winners', function (request, response) {
-    gameTool.loadWinnersPageData('point', function (winners) {
-        console.log('Winners', winners);
+app.get('/winners/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadWinnersPageData(year, 'point', function (data) {
+        console.log('Winners', data);
         response.render('pages/winners', {
-        	winners: winners,
-            nav: getNavFor('/winners')
+        	winners: data.winners,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor('/winners'),
+            url: '/winners'
         });
     });
 });
@@ -293,12 +324,16 @@ app.get('/api/1.0/winners', function (request, response) {
     });
 });
 
-app.get('/captains', function (request, response) {
-    gameTool.loadCaptainsPageData('point', function (captains) {
-        console.log('Captains', captains);
+app.get('/captains/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadCaptainsPageData(year, 'point', function (data) {
+        console.log('Captains', data);
         response.render('pages/captains', {
-            captains: captains,
-            nav: getNavFor('/captains')
+            captains: data.captains,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor('/captains'),
+            url: '/captains'
         });
     });
 });
@@ -319,7 +354,10 @@ app.get('/trinity/:size', function (request, response) {
         console.log('Trinity', trinity);
         response.render('pages/trinity', {
             trinity: trinity,
-            nav: getNavFor('')
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor(''),
+            url: '/trinity'
         });
     });
 });

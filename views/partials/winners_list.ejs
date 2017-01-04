@@ -18,7 +18,7 @@
     <% for(var i = 0; i < max; i++) { %>
     <tr>
         <th scope="row"><%= i + 1 %></th>
-        <td><a href="/player/<%= winners[i].id %>"><%= winners[i].name %></a></td>
+        <td><a href="/player/<%= winners[i].id %>/<%= currentYear %>"><%= winners[i].name %></a></td>
         <td><%= winners[i].wins %>-<%= winners[i].draws %>-<%= winners[i].losses %></td>
 	    <% if (full_scorers) { %>
 	    <td><%= winners[i].winsPers %></td>

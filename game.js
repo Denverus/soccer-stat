@@ -53,7 +53,7 @@ module.exports = {
             });
         });
     },
-    loadGamesPageData: function (response) {
+    loadGamesPageData: function (year, response) {
     	async.series({
             games: function (callback) {
             	loadAllGames(year, function (games) {
@@ -106,19 +106,52 @@ module.exports = {
             response(results);
         });
     },
-    loadPlayerProfilePageData: function (playerId, response) {
-        loadPlayerProfile(playerId, function (player) {
-            response(player);
+    loadPlayerProfilePageData: function (year, playerId, response) {
+        async.series({
+            player: function (callback) {
+                loadPlayerProfile(year, playerId, function (player) {
+                    callback(null, player);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
+                });
+            }
+        }, function (err, results) {
+            response(results);
         });
     },
-    loadWinnersPageData: function (order, response) {
-        loadWinners(order, function (winners) {
-            response(winners);
+    loadWinnersPageData: function (year, order, response) {
+        async.series({
+            winners: function (callback) {
+                loadWinners(year, order, function (winners) {
+                    callback(null, winners);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
+                });
+            }
+        }, function (err, results) {
+            response(results);
         });
     },
-    loadCaptainsPageData: function (order, response) {
-        loadCaptainsStat(order, function (captains) {
-            response(captains);
+    loadCaptainsPageData: function (year, order, response) {
+        async.series({
+            captains: function (callback) {
+                loadCaptainsStat(year, order, function (captains) {
+                    callback(null, captains);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
+                });
+            }
+        }, function (err, results) {
+            response(results);
         });
     },
     loadTrinityPageData: function (size, order, response) {

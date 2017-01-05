@@ -402,11 +402,6 @@ loadAllPlayersStat = function (year, order, response) {
             if (games.hasOwnProperty(gameProp)) {
                 var game = games[gameProp];
 
-                var playerNoDublicates = new Map();
-
-                //squadsToPlayerMap(playerNoDublicates, game.color.squad, game.white.squad);
-                //console.log('playerNoDublicates =' + playerNoDublicates.keys());
-
                 calcPlayerAppereance(playerMap, game.color.squad, game.white.squad);
 
                 var events = game.events;
@@ -628,10 +623,53 @@ loadWinners = function (year, order, response) {
             if (games.hasOwnProperty(gameProp)) {
                 var game = games[gameProp];
 
-                var players = allPlayersFromGame(game);
-
                 var colorSquad = game.color.squad;
                 var whiteSquad = game.white.squad;
+
+                var players = new Map();
+
+                calcPlayerAppereance(players, colorSquad, whiteSquad);
+
+                players.forEach(function (value, key, map) {
+                    var playerId = key;
+                    var player = playerMap.get(playerId);
+                    if (player == null) {
+                        player = {
+                            id: playerId,
+                            name: playerId,
+                            wins: 0,
+                            draws: 0,
+                            losses: 0,
+                            points: 0,
+                            winsPers: 0
+                        };
+                    }
+
+                    var squadTime = {
+                        color: calcPlayedTime(playerId, colorSquad),
+                        white: calcPlayedTime(playerId, whiteSquad)
+                    };
+
+                    if (squadTime.color > squadTime.white) {
+                        if (game.color.score > game.white.score) {
+                            player.wins++;
+                        } else if (game.color.score < game.white.score) {
+                            player.losses++;
+                        } else if (game.color.score == game.white.score) {
+                            player.draws++;
+                        }
+                    } else {
+                        if (game.color.score < game.white.score) {
+                            player.wins++;
+                        } else if (game.color.score > game.white.score) {
+                            player.losses++;
+                        } else if (game.color.score == game.white.score) {
+                            player.draws++;
+                        }
+                    }
+
+                    playerMap.set(playerId, player);
+                });
 
                 for (var index in players) {
 

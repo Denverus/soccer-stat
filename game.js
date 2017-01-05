@@ -367,19 +367,29 @@ createPlayerStatObj = function (playerProp) {
     return player;
 }
 
-calcPlayerAppereance = function (playerMap, squad) {
-    for (var playerProp in squad) {
-        if (squad.hasOwnProperty(playerProp)) {
-            var player = playerMap.get(playerProp);
-            if (player != null) {
-                player.games++;
-            } else {
-                var player = createPlayerStatObj(playerProp);
-                player.games = 1;
-                playerMap.set(playerProp, player);
-            }
+calcPlayerAppereance = function (playerMap, squad1, squad2) {
+    var tmpMap = new Map();
+    for (var playerProp in squad1) {
+        if (squad1.hasOwnProperty(playerProp)) {
+            tmpMap.set(playerProp, playerProp);
         }
     }
+    for (var playerProp in squad2) {
+        if (squad2.hasOwnProperty(playerProp)) {
+            tmpMap.set(playerProp, playerProp);
+        }
+    }
+
+    tmpMap.forEach(function (value, key, map) {
+        var player = playerMap.get(key);
+        if (player != null) {
+            player.games++;
+        } else {
+            var player = createPlayerStatObj(key);
+            player.games = 1;
+            playerMap.set(key, player);
+        }
+    });
 }
 
 loadAllPlayersStat = function (year, order, response) {
@@ -392,8 +402,7 @@ loadAllPlayersStat = function (year, order, response) {
             if (games.hasOwnProperty(gameProp)) {
                 var game = games[gameProp];
 
-                calcPlayerAppereance(playerMap, game.color.squad);
-                calcPlayerAppereance(playerMap, game.white.squad);
+                calcPlayerAppereance(playerMap, game.color.squad, game.white.squad);
 
                 var events = game.events;
                 for (var eventProp in events) {
@@ -614,10 +623,53 @@ loadWinners = function (year, order, response) {
             if (games.hasOwnProperty(gameProp)) {
                 var game = games[gameProp];
 
-                var players = allPlayersFromGame(game);
-
                 var colorSquad = game.color.squad;
                 var whiteSquad = game.white.squad;
+
+                var players = new Map();
+
+                calcPlayerAppereance(players, colorSquad, whiteSquad);
+
+                players.forEach(function (value, key, map) {
+                    var playerId = key;
+                    var player = playerMap.get(playerId);
+                    if (player == null) {
+                        player = {
+                            id: playerId,
+                            name: playerId,
+                            wins: 0,
+                            draws: 0,
+                            losses: 0,
+                            points: 0,
+                            winsPers: 0
+                        };
+                    }
+
+                    var squadTime = {
+                        color: calcPlayedTime(playerId, colorSquad),
+                        white: calcPlayedTime(playerId, whiteSquad)
+                    };
+
+                    if (squadTime.color > squadTime.white) {
+                        if (game.color.score > game.white.score) {
+                            player.wins++;
+                        } else if (game.color.score < game.white.score) {
+                            player.losses++;
+                        } else if (game.color.score == game.white.score) {
+                            player.draws++;
+                        }
+                    } else {
+                        if (game.color.score < game.white.score) {
+                            player.wins++;
+                        } else if (game.color.score > game.white.score) {
+                            player.losses++;
+                        } else if (game.color.score == game.white.score) {
+                            player.draws++;
+                        }
+                    }
+
+                    playerMap.set(playerId, player);
+                });
 
                 for (var index in players) {
 

@@ -26,7 +26,9 @@
                 <% } else { %>
                     <li>
                 <% }  %>
-                        <a href="<%= nav[i].url %>/<%= currentYear %>"><span class="glyphicon glyphicon-<%= nav[i].icon %>"></span> <%= nav[i].title %></a>
+                    <% var nav_url = nav[i].url + '/' + currentYear %>
+                    <% if (nav[i].url == '/') { nav_url = '/' } %>
+                        <a href="<%= nav_url %>"><span class="glyphicon glyphicon-<%= nav[i].icon %>"></span> <%= nav[i].title %></a>
                     </li>
                 <% } %>
             </ul>

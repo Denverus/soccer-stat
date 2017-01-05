@@ -79,7 +79,7 @@ app.get('/', function (request, response) {
                 years: data.years,
                 currentYear: year,
                 nav: getNavFor('/'),
-                url: '/'
+                url: '/year'
             };
         console.log('Index page data ', uiData);
         response.render('pages/index', uiData);
@@ -101,7 +101,7 @@ app.get('/year/:year', function (request, response) {
             years: data.years,
             currentYear: year,
             nav: getNavFor('/'),
-            url: '/'
+            url: '/year'
         });
     });
 });

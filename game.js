@@ -76,11 +76,6 @@ module.exports = {
                     callback(null, game);
                 });
             },
-            gameStat: function (callback) {
-                loadFullGame(year, gameId, function (game) {
-                    callback(null, game);
-                });
-            },
             years: function (callback) {
                 getListOfYears(function (years) {
                     callback(null, years);
@@ -229,7 +224,11 @@ loadOneGame = function (year, gameId, response) {
     firebase.database.ref(games_brunch + '/'+year + '/' + gameId).once('value').then(function (snapshot) {
         var game = snapshot.val();
         game.id = gameId;
-        response(game);
+
+        loadEvents(year, gameId, function(events) {
+            game.events = events;
+            response(game);
+        });
     });
 }
 

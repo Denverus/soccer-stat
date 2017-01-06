@@ -150,7 +150,6 @@ app.get('/game/:year/:gameId', function (request, response) {
         console.log('Single game ', data);
         response.render('pages/single_game', {
             game: data.game,
-            gameStat: data.gameStat,
             years: data.years,
             currentYear: year,
             nav: getNavFor(''),

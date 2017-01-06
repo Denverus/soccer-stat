@@ -23,14 +23,14 @@
 
 <div class="col-md-4 col-md-pull-4 col-xs-12">
     <% var teamName = 'White'; %>
-    <% var team = game.white; %>
+    <% var squad = game.white.squad; %>
     <% var captain = whiteCaptain; %>
     <% include ../partials/squad.ejs %>
 </div>
 
 <div class="col-md-4 col-xs-12">
     <% var teamName = 'Color'; %>
-    <% var team = game.color; %>
+    <% var squad = game.color.squad; %>
     <% var captain = colorCaptain; %>
     <% include ../partials/squad.ejs %>
 </div>

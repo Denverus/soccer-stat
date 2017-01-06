@@ -233,6 +233,8 @@ loadOneGame = function (year, gameId, response) {
         var events = game.events;
         // Convert events to array
         var eventsArray = new Array;
+        var whiteGoals = 0;
+        var colorGoals = 0;
         for (var o in events) {
             var event = events[o];
             eventsArray.push(event);
@@ -240,10 +242,18 @@ loadOneGame = function (year, gameId, response) {
             // Calc player stat
             if (event.team == 'white') {
                 calcPlayerStatInGame(event, whiteSquad);
+                if (event.type == null) {
+                    whiteGoals++;
+                }
             }
             if (event.team == 'color') {
                 calcPlayerStatInGame(event, colorSquad);
+                if (event.type == null) {
+                    colorGoals++;
+                }
             }
+
+            event.score = whiteGoals + ':' + colorGoals;
         }
 
         game.white.squad = whiteSquad;

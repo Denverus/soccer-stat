@@ -626,7 +626,11 @@ loadWinners = function (year, order, response) {
                             draws: 0,
                             losses: 0,
                             points: 0,
-                            winsPers: 0
+                            winsPers: 0,
+                            team_scored: 0,
+                            team_conceded: 0,
+                            team_scored_per_game: 0,
+                            team_conceded_per_game: 0
                         };
                     }
 
@@ -643,6 +647,8 @@ loadWinners = function (year, order, response) {
                         } else if (game.color.score == game.white.score) {
                             player.draws++;
                         }
+                        player.team_scored += game.color.score;
+                        player.team_conceded += game.white.score;
                     } else {
                         if (game.color.score < game.white.score) {
                             player.wins++;
@@ -651,53 +657,12 @@ loadWinners = function (year, order, response) {
                         } else if (game.color.score == game.white.score) {
                             player.draws++;
                         }
+                        player.team_scored += game.white.score;
+                        player.team_conceded += game.color.score;
                     }
 
                     playerMap.set(playerId, player);
                 });
-
-                for (var index in players) {
-
-                    var playerId = players[index];
-                    var player = playerMap.get(playerId);
-                    if (player == null) {
-                        player = {
-                            id: playerId,
-                            name: playerId,
-                            wins: 0,
-                            draws: 0,
-                            losses: 0,
-                            points: 0,
-                            winsPers: 0
-                        };
-                    }
-
-                    var squadTime = {
-                        color: calcPlayedTime(playerId, colorSquad),
-                        white: calcPlayedTime(playerId, whiteSquad)
-                    };
-
-                    if (squadTime.color > squadTime.white) {
-                        if (game.color.score > game.white.score) {
-                            player.wins++;
-                        } else if (game.color.score < game.white.score) {
-                            player.losses++;
-                        } else if (game.color.score == game.white.score) {
-                            player.draws++;
-                        }
-                    } else {
-                        if (game.color.score < game.white.score) {
-                            player.wins++;
-                        } else if (game.color.score > game.white.score) {
-                            player.losses++;
-                        } else if (game.color.score == game.white.score) {
-                            player.draws++;
-                        }
-                    }
-
-                    playerMap.set(playerId, player);
-
-                }
             }
         }
 
@@ -706,8 +671,16 @@ loadWinners = function (year, order, response) {
             // Points
             value.points = value.wins * 3 + value.draws;
             // Wins percentage
-            winsPers = value.wins / (value.wins + value.draws + value.losses);
+            var games_count = value.wins + value.draws + value.losses;
+
+            var winsPers = value.wins / games_count;
             value.winsPers = Math.round(winsPers * 1000) / 1000;
+
+            var team_scored_per_game = value.team_scored / games_count;
+            value.team_scored_per_game = Math.round(team_scored_per_game * 10) / 10;
+
+            var team_conceded_per_game = value.team_conceded / games_count;
+            value.team_conceded_per_game = Math.round(team_conceded_per_game * 10) / 10;
 
             result.push(value);
         });

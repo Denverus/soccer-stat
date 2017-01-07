@@ -3,7 +3,7 @@
     <div class="panel-heading"><%= teamName %>
         <% if (captain != null) { %>
         - captain:
-        <b><%= captain %></b>
+        <b><a href="/player/<%= captain %>/<%= currentYear %>"><%= captain %></a></b>
         <% } %>
     </div>
     <!-- Table -->
@@ -12,17 +12,21 @@
         <tr>
             <th>#</th>
             <th>Player</th>
-<!--            <th>Goals</th>
-            <th>Assists</th>-->
+            <th>Time</th>
+            <th>Goals</th>
+            <th>Assists</th>
         </tr>
         </thead>
         <tbody>
-        <% for(var i=0; i < team.length; i++) { %>
+        <% var i = 1; %>
+        <% console.log('squad ', squad); %>
+        <% for (var player in squad) { %>
         <tr>
-            <th scope="row"><%= i+1 %></th>
-            <td><a href="/player/<%= team[i].name %>/<%= currentYear %>"><%= team[i].name %></a></td>
-<!--            <td><%= team[i].goals %></td>
-            <td><%= team[i].assists %></td> -->
+            <th scope="row"><%= i++ %></th>
+            <td><a href="/player/<%= player %>/<%= currentYear %>"><%= player %></a></td>
+            <td><%= squad[player].time %>%</td>
+            <td><%= squad[player].goals %></td>
+            <td><%= squad[player].assists %></td>
         </tr>
         <% } %>
         </tbody>

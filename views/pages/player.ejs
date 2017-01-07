@@ -35,6 +35,7 @@
                         <th style ="word-break:break-all;">Result</th>
                         <th style ="word-break:break-all;">Goals</th>
                         <th style ="word-break:break-all;">Asists</th>
+                        <th style ="word-break:break-all;">Own goals</th>
                         <th>G+A</th>
                     </tr>
                     </thead>
@@ -47,13 +48,14 @@
                         <th></th>
                         <th><%= player.summary.goals %></th>
                         <th><%= player.summary.assists %></th>
+                        <th><%= player.summary.ownGoals %></th>
                         <th><%= player.summary.glas %></th>
                     </tr>
                     <% for(var i = 0; i < player.games.length; i++) { %>
                     <tr>
                         <td><%= player.games[i].num %></td>
                         <td><%= player.games[i].date %></td>
-                        <td><a href="/game/<%= player.games[i].gameId %>"><%= player.games[i].game %></a></td>
+                        <td><a href="/game/<%= currentYear %>/<%= player.games[i].gameId %>"><%= player.games[i].game %></a></td>
                         <td>
                             <% var team = player.games[i].team %>
                             <% if (team != null) { %>
@@ -80,6 +82,11 @@
                         <td>
                             <% if (team != null) { %>
                             <%= player.games[i].assists %>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if (team != null) { %>
+                            <%= player.games[i].ownGoals %>
                             <% } %>
                         </td>
                         <td>

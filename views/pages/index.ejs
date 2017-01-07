@@ -16,13 +16,13 @@
         <div class="panel panel-primary">
             <div class="panel-heading"><h3 class="panel-title">Last game</h3></div>
             <div class="panel-body">
-                <% var gameDate = lastGame.game.date; %>
+                <% var gameDate = lastGame.date; %>
                 <% var game = lastGame; %>
-                <% var whiteScore = game.score.white; %>
-                <% var colorScore = game.score.color; %>
+                <% var whiteScore = game.white.score; %>
+                <% var colorScore = game.color.score; %>
                 <% include ../partials/game_short_display.ejs %>
             </div>
-            <div class="panel-footer"><a href="/game/<%= currentYear %>/<%= lastGame.game.id %>" class="navbar-link">Full report</a></div>
+            <div class="panel-footer"><a href="/game/<%= currentYear %>/<%= lastGame.id %>" class="navbar-link">Full report</a></div>
         </div>
     </div>
     

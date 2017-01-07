@@ -126,3 +126,45 @@
     width: 16px;
     height: 16px;
 }
+
+.icon-own-goal {
+    background: url(../images/own_goal.png);
+    background-size: cover;
+}
+
+.icon-own-goal.normal {
+    width: 16px;
+    height: 16px;
+}
+
+.icon-transfer {
+    background: url(../images/transfer.png);
+    background-size: cover;
+}
+
+.icon-transfer.normal {
+    width: 16px;
+    height: 16px;
+}
+
+.icon-transfer-white-color {
+    background: url(../images/transfer-white-color.png);
+    background-size: cover;
+    float: right;
+}
+
+.icon-transfer-white-color.normal {
+    width: 56px;
+    height: 24px;
+}
+
+.icon-transfer-color-white {
+    background: url(../images/transfer-color-white.png);
+    background-size: cover;
+    float: right;
+}
+
+.icon-transfer-color-white.normal {
+    width: 56px;
+    height: 24px;
+}

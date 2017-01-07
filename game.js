@@ -9,7 +9,7 @@ module.exports = {
         loadLastGameId(year, function (lastGameId) {
             async.series({
                 lastGame: function (callback) {
-                    loadFullGame(year, lastGameId, function (game) {
+                    loadOneGame(year, lastGameId, function (game) {
                         callback(null, game);
                     });
                 },
@@ -73,11 +73,6 @@ module.exports = {
         async.series({
             game: function (callback) {
                 loadOneGame(year, gameId, function (game) {
-                    callback(null, game);
-                });
-            },
-            gameStat: function (callback) {
-                loadFullGame(year, gameId, function (game) {
                     callback(null, game);
                 });
             },
@@ -164,38 +159,6 @@ module.exports = {
     }
 };
 
-loadFullGame = function (year, gameId, response) {
-    async.series({
-        game: function (callback) {
-            loadOneGame(year, gameId, function (game) {
-                callback(null, game);
-            });
-        },
-        score: function (callback) {
-            loadScore(year, gameId, function (score) {
-                callback(null, score);
-            });
-        },
-        white: function (callback) {
-            loadSquad(year, gameId, true, function (squad) {
-                callback(null, squad);
-            });
-        },
-        color: function (callback) {
-            loadSquad(year, gameId, false, function (squad) {
-                callback(null, squad);
-            });
-        },
-        events: function (callback) {
-            loadEvents(year, gameId, function (squad) {
-                callback(null, squad);
-            });
-        }
-    }, function (err, results) {
-        response(results);
-    });
-}
-
 loadConfig = function (response) {
     firebase.database.ref('/config').once('value').then(function (snapshot) {
         response(snapshot.val());
@@ -225,75 +188,81 @@ loadLastGameId = function (year, response) {
     });
 }
 
+addStatFieldToPlayers = function (squad) {
+    for (var playerId in squad) {
+        var player = squad[playerId];
+        var newPlayer = {
+            name: playerId,
+            goals: 0,
+            assists: 0,
+            glas: 0,
+            time: player.time
+        };
+        squad[playerId] = newPlayer;
+    }
+}
+
+calcPlayerStatInGame = function(event, squad) {
+    if (event.type == null) {
+        var author = squad[event.author];
+        var assist = squad[event.assist];
+
+        if (author != null) {
+            author.goals++;
+            author.glas++;
+        }
+
+        if (assist != null) {
+            assist.assists++;
+            assist.glas++;
+        }
+    }
+}
+
 loadOneGame = function (year, gameId, response) {
     firebase.database.ref(games_brunch + '/'+year + '/' + gameId).once('value').then(function (snapshot) {
         var game = snapshot.val();
         game.id = gameId;
-        response(game);
-    });
-}
 
-loadGameShort = function (gameId, response) {
-    async.series({
-        score: function (callback) {
-            loadScore(gameId, function (score) {
-                callback(null, score);
-            });
-        },
-        date: function (callback) {
-            loadDate(gameId, function (date) {
-                callback(null, date);
-            });
-        },
-    }, function (err, results) {
-        response(results);
-    });
-}
+        var whiteSquad = game.white.squad;
+        var colorSquad = game.color.squad;
 
-loadScore = function (year, gameId, response) {
-    firebase.database.ref(games_brunch + '/' + year + '/' + gameId).once('value').then(function (snapshot) {
-        var game = snapshot.val();
-        var score = {
-            color: game.color.score,
-            white: game.white.score
-        };
-        response(score);
-    });
-}
+        addStatFieldToPlayers(whiteSquad);
+        addStatFieldToPlayers(colorSquad);
 
-loadDate = function (year, gameId, response) {
-    firebase.database.ref(games_brunch + '/' + year + '/' + gameId).once('value').then(function (snapshot) {
-        var game = snapshot.val();
-        response(game.date);
-    });
-}
-
-loadSquad = function (year, gameId, white, response) {
-    var team = 'color';
-    if (white) {
-        team = 'white';
-    }
-    ;
-    firebase.database.ref(games_brunch + '/' + year + '/' + gameId + '/' + team + '/squad').once('value').then(function (snapshot) {
-        var squad = snapshot.val();
-        var dataArray = new Array;
-        for (var o in squad) {
-            squad[o].name = o;
-            dataArray.push(squad[o]);
-        }
-        response(dataArray);
-    });
-}
-
-
-loadEvents = function (year, gameId, response) {
-    firebase.database.ref(games_brunch + '/' + year + '/' + gameId + '/events').once('value').then(function (snapshot) {
-        var events = snapshot.val();
-        var dataArray = new Array;
+        var events = game.events;
+        // Convert events to array
+        var eventsArray = new Array;
+        var whiteGoals = 0;
+        var colorGoals = 0;
         for (var o in events) {
-            dataArray.push(events[o]);
+            var event = events[o];
+            eventsArray.push(event);
+
+            // Calc player stat
+            if (event.team == 'white') {
+                calcPlayerStatInGame(event, whiteSquad);
+                if (event.type == null) {
+                    whiteGoals++;
+                }
+            }
+            if (event.team == 'color') {
+                calcPlayerStatInGame(event, colorSquad);
+                if (event.type == null) {
+                    colorGoals++;
+                }
+            }
+
+            event.score = whiteGoals + ':' + colorGoals;
         }
-        response(dataArray);
+
+        game.white.squad = whiteSquad;
+        game.color.squad = colorSquad;
+
+        // Put events (now as array) back to game object
+        game.events = eventsArray;
+
+        response(game);
     });
 }
 
@@ -361,6 +330,7 @@ createPlayerStatObj = function (playerProp) {
         name: playerProp,
         games: 0,
         goals: 0,
+        ownGoals: 0,
         assists: 0,
         glas: 0
     };
@@ -429,6 +399,14 @@ loadAllPlayersStat = function (year, order, response) {
                                 player.glas++;
                             }
                         }
+                        if (event.type == 'owngoal') {
+                            var author = event.author;
+                            var player = playerMap.get(author);
+                            if (player == null) {
+                                player = createPlayerStatObj(author);
+                            }
+                            player.ownGoals++;
+                        }
                     }
                 }
             }
@@ -464,6 +442,7 @@ loadPlayerProfile = function (year, playerId, response) {
                 goals: 0,
                 assists: 0,
                 glas: 0,
+                ownGoals: 0,
                 wins: 0,
                 draws: 0,
                 losses: 0
@@ -487,6 +466,7 @@ loadPlayerProfile = function (year, playerId, response) {
                     win: null,
                     goals: 0,
                     assists: 0,
+                    ownGoals: 0,
                     glas: 0
                 };
                 var squadColor = dbGame.color.squad;
@@ -543,6 +523,11 @@ loadPlayerProfile = function (year, playerId, response) {
                                 player.summary.glas++;
                                 game.glas++;
                             }
+                        }
+                        if (event.type == 'owngoal') {
+                            var author = event.author;
+                            player.summary.ownGoals++;
+                            game.ownGoals++;
                         }
                     }
                 }

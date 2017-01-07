@@ -330,6 +330,7 @@ createPlayerStatObj = function (playerProp) {
         name: playerProp,
         games: 0,
         goals: 0,
+        ownGoals: 0,
         assists: 0,
         glas: 0
     };
@@ -398,6 +399,14 @@ loadAllPlayersStat = function (year, order, response) {
                                 player.glas++;
                             }
                         }
+                        if (event.type == 'owngoal') {
+                            var author = event.author;
+                            var player = playerMap.get(author);
+                            if (player == null) {
+                                player = createPlayerStatObj(author);
+                            }
+                            player.ownGoals++;
+                        }
                     }
                 }
             }
@@ -433,6 +442,7 @@ loadPlayerProfile = function (year, playerId, response) {
                 goals: 0,
                 assists: 0,
                 glas: 0,
+                ownGoals: 0,
                 wins: 0,
                 draws: 0,
                 losses: 0
@@ -456,6 +466,7 @@ loadPlayerProfile = function (year, playerId, response) {
                     win: null,
                     goals: 0,
                     assists: 0,
+                    ownGoals: 0,
                     glas: 0
                 };
                 var squadColor = dbGame.color.squad;
@@ -512,6 +523,11 @@ loadPlayerProfile = function (year, playerId, response) {
                                 player.summary.glas++;
                                 game.glas++;
                             }
+                        }
+                        if (event.type == 'owngoal') {
+                            var author = event.author;
+                            player.summary.ownGoals++;
+                            game.ownGoals++;
                         }
                     }
                 }

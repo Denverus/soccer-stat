@@ -3,7 +3,7 @@
     <div class="panel-heading"><%= teamName %>
         <% if (captain != null) { %>
         - captain:
-        <b><%= captain %></b>
+        <b><a href="/player/<%= captain %>/<%= currentYear %>"><%= captain %></a></b>
         <% } %>
     </div>
     <!-- Table -->

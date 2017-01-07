@@ -5,6 +5,7 @@
         <th>Player</th>
         <th>G</th>
         <th>A</th>
+        <th>OG</th>
         <th>G+A</th>
         <th>Games</th>
     </tr>
@@ -13,9 +14,10 @@
     <% for(var i = 0; i < players.length; i++) { %>
     <tr>
         <th scope="row"><%= i + 1 %></th>
-        <td><a href="/player/<%= players[i].name %>"><%= players[i].name %></a></td>
+        <td><a href="/player/<%= players[i].name %>/<%= currentYear %>"><%= players[i].name %></a></td>
         <td><%= players[i].goals %></td>
         <td><%= players[i].assists %></td>
+        <td><%= players[i].ownGoals %></td>
         <td><%= players[i].glas %></td>
         <td><%= players[i].games %></td>
     </tr>

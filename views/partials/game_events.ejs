@@ -3,30 +3,27 @@
     <% for(var i = 0; i < events.length; i++) { %>
     <li class="list-group-item">
         <% if (events[i].type == null) { %>
-        <%= events[i].score %>
-        <span class="icon-event icon-goal normal left" style="margin-right: 5px;"></span>
-        <span class="icon-tshirt icon-<%= events[i].team %> normal right"></span>
+            <%= events[i].score %>
+            <span class="icon-event icon-goal normal left" style="margin-right: 5px;"></span>
+            <span class="icon-tshirt icon-<%= events[i].team %> normal right"></span>
+            <a href="/player/<%= events[i].author %>/<%= currentYear %>"><%= events[i].author %></a>
+            <% if (events[i].assist != null) { %>
+            <a href="/player/<%= events[i].assist %>/<%= currentYear %>">(<%= events[i].assist %>)</a>
+            <% } %>
         <% } %>
 
         <% if (events[i].type == 'owngoal') { %>
-        <%= events[i].score %>
-        <span class="icon-event icon-goal normal left" style="margin-right: 5px;"></span>
-        <span class="icon-tshirt icon-<%= events[i].team %> normal right"></span>
+            <%= events[i].score %>
+            <span class="icon-event icon-own-goal normal left" style="margin-right: 5px;"></span>
+            <span class="icon-tshirt icon-<%= events[i].team %> normal right"></span>
+            <a href="/player/<%= events[i].author %>/<%= currentYear %>"><%= events[i].author %></a>
+            (own goal)
         <% } %>
 
         <% if (events[i].type == 'transfer') { %>
-        <a href="/player/<%= events[i].player %>/<%= currentYear %>"><%= events[i].player %></a>
-        <span class="icon-tshirt icon-<%= events[i].from %> normal"></span>
-        =>
-        <span class="icon-tshirt icon-<%= events[i].to %> normal"></span>
-        <% } %>
-
-        <a href="/player/<%= events[i].author %>/<%= currentYear %>"><%= events[i].author %></a>
-        <% if (events[i].type == 'owngoal') { %>
-        (own goal)
-        <% } %>
-        <% if (events[i].assist != null) { %>
-        <a href="/player/<%= events[i].assist %>/<%= currentYear %>">(<%= events[i].assist %>)</a>
+            <span class="icon-event icon-transfer normal left" style="margin-right: 5px;"></span>
+            <a href="/player/<%= events[i].player %>/<%= currentYear %>"><%= events[i].player %></a>
+            <span class="icon-event icon-transfer-<%= events[i].from %>-<%= events[i].to %> normal right"></span>
         <% } %>
     </li>
     <% } %>

@@ -54,9 +54,9 @@ module.exports = {
         });
     },
     loadGamesPageData: function (year, response) {
-    	async.series({
+        async.series({
             games: function (callback) {
-            	loadAllGames(year, function (games) {
+                loadAllGames(year, function (games) {
                     callback(null, games);
                 });
             },
@@ -67,7 +67,7 @@ module.exports = {
             }
         }, function (err, results) {
             response(results);
-        });    	
+        });
     },
     loadOneGamePageData: function (year, gameId, response) {
         async.series({
@@ -154,6 +154,38 @@ module.exports = {
             response(trinity);
         });
     },
+    loadRatingsPageData: function (response) {
+        async.series({
+            ratings: function (callback) {
+                loadRatings(function (ratings) {
+                    callback(null, ratings);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
+                });
+            }
+        }, function (err, results) {
+            response(results);
+        });
+    },
+    loadRatingsMathPageData: function (player, response) {
+        async.series({
+            math: function (callback) {
+                loadRatingsMath(player, function (math) {
+                    callback(null, math);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
+                });
+            }
+        }, function (err, results) {
+            response(results);
+        });
+    },
     copyEvents: function () {
         //copyEvents();
     }
@@ -166,7 +198,7 @@ loadConfig = function (response) {
 }
 
 loadLastGameId = function (year, response) {
-    firebase.database.ref(games_brunch + '/'+year).once('value').then(function (snapshot) {
+    firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
         var games = snapshot.val();
         var gamesIndexArray = Object.keys(games);
         var gamesArray = [];
@@ -202,7 +234,7 @@ addStatFieldToPlayers = function (squad) {
     }
 }
 
-calcPlayerStatInGame = function(event, squad) {
+calcPlayerStatInGame = function (event, squad) {
     if (event.type == null) {
         var author = squad[event.author];
         var assist = squad[event.assist];
@@ -220,7 +252,7 @@ calcPlayerStatInGame = function(event, squad) {
 }
 
 loadOneGame = function (year, gameId, response) {
-    firebase.database.ref(games_brunch + '/'+year + '/' + gameId).once('value').then(function (snapshot) {
+    firebase.database.ref(games_brunch + '/' + year + '/' + gameId).once('value').then(function (snapshot) {
         var game = snapshot.val();
         game.id = gameId;
 
@@ -1002,4 +1034,119 @@ copyEvents = function () {
     var fromRef = firebase.database.ref('games/');
     var toRef = firebase.database.ref('games_new/2016');
     //copyFbRecord(fromRef, toRef);
+}
+
+loadRatings = function (response) {
+    var ratings = [];
+    ratings.push(
+        {
+            id: 'denis',
+            name: 'denis',
+            game1: 10,
+            game2: 11,
+            game3: 12,
+            game4: 13,
+            game5: 14,
+            points: 55,
+            progress_place: 5,
+            progress_point: 10
+        }
+    );
+    ratings.push(
+        {
+            id: 'vadim',
+            name: 'vadim',
+            game1: 10,
+            game2: 11,
+            game3: 12,
+            game4: 13,
+            game5: 14,
+            points: 52,
+            progress_place: 5,
+            progress_point: 10
+        }
+    );
+    ratings.push(
+        {
+            id: 'max',
+            name: 'max',
+            game1: 10,
+            game2: 11,
+            game3: 12,
+            game4: 13,
+            game5: 14,
+            points: 51,
+            progress_place: 5,
+            progress_point: 10
+        }
+    );
+    response(ratings);
+}
+
+loadRatingsMath = function (player, response) {
+    var gamesStat = [];
+    var math = {
+        player: {
+            name: 'denis',
+            id: 'denis'
+        },
+        wins: 3,
+        draws: 1,
+        played: 5,
+        games: []
+    };
+    gamesStat.push(
+        {
+            date: '1-6-2017',
+            title: 'White - Color 4:5',
+            url: '2017/0102',
+            played: true,
+            team: 'white',
+            win: true,
+            goals: 10,
+            own_goals: 11,
+            assists: 12,
+            team_scored: 13,
+            team_conceded: 14,
+            points: 55,
+            progress_place: 5,
+            progress_point: 10
+        }
+    );
+    gamesStat.push(
+        {
+            date: '1-4-2017',
+            title: 'White - Color 1:3',
+            url: '2017/0102',
+            played: true,
+            team: 'color',
+            goals: 10,
+            own_goals: 11,
+            assists: 12,
+            team_scored: 13,
+            team_conceded: 14,
+            points: 55,
+            progress_place: 5,
+            progress_point: 10
+        }
+    );
+    gamesStat.push(
+        {
+            date: '1-2-2017',
+            title: 'White - Color 3:3',
+            url: '2017/0102',
+            played: true,
+            team: 'color',
+            goals: 10,
+            own_goals: 11,
+            assists: 12,
+            team_scored: 13,
+            team_conceded: 14,
+            points: 55,
+            progress_place: 5,
+            progress_point: 10
+        }
+    );
+    math.games = gamesStat;
+    response(math);
 }

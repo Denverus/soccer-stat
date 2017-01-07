@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Russian Soccer stat - Player</title>
+    <% include ../partials/header.ejs %>
+    <% include ../partials/counters.ejs %>
+</head>
+
+<body>
+
+<% include ../partials/nav.ejs %>
+
+<div id="main" class="container">
+
+    <div class="col-md-12 col-xs-12">
+        <h1><%= math.player.name %></h1>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                Wins: <span class="badge"><%= math.wins %></span>
+                Draws: <span class="badge"><%= math.draws %></span>
+                Played: <span class="badge"><%= math.played %></span>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style ="word-break:break-all;">D</th>
+                        <th style ="word-break:break-all;">M</th>
+                        <th style ="word-break:break-all;">T</th>
+                        <th style ="word-break:break-all;">R</th>
+                        <th style ="word-break:break-all;">G</th>
+                        <th style ="word-break:break-all;">A</th>
+                        <th style ="word-break:break-all;">OG</th>
+                        <th style ="word-break:break-all;">G+A</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <% for(var i = 0; i < math.games.length; i++) { %>
+                    <tr>
+                        <td><%= math.games[i].date %></td>
+                        <td><a href="/game/<%= currentYear %>/<%= math.games[i].url %>"><%= math.games[i].title %></a></td>
+                        <td>
+                            <% var team = math.games[i].team %>
+                            <% if (team != null) { %>
+                            <span class="icon-tshirt icon-<%= team %> normal"></span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% var win = math.games[i].win %>
+                            <% if (win == 1) { %>
+                            <span class="glyphicon glyphicon-ok-sign color-win"></span>
+                            <% } %>
+                            <% if (win == -1) { %>
+                            <span class="glyphicon glyphicon-remove-sign color-loss"></span>
+                            <% } %>
+                            <% if (win == 0) { %>
+                            <span class="glyphicon glyphicon-minus-sign color-draw"></span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if (team != null) { %>
+                            <%= math.games[i].goals %>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if (team != null) { %>
+                            <%= math.games[i].assists %>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if (team != null) { %>
+                            <%= math.games[i].own_goals %>
+                            <% } %>
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-footer">
+                <b>D</b> - Date,
+                <b>M</b> - Match title,
+                <b>T</b> - Team,
+                <b>R</b> - result,
+                (<span class="glyphicon glyphicon-ok-sign color-win"></span> - win,
+                <span class="glyphicon glyphicon-remove-sign color-loss"></span> - loss
+                <span class="glyphicon glyphicon-minus-sign color-draw"></span> - draw),
+                <b>G</b> - Goals scored,
+                <b>A</b> - Assists,
+                <b>OG</b> - Own goals
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+<table class="table">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Player</th>
+        <th>G1 * 0.5</th>
+        <th>G2 * 0.75</th>
+        <th>G3</th>
+        <th>G4</th>
+        <th>G5</th>
+        <th>P</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% for(var i = 0; i < ratings.length; i++) { %>
+    <tr>
+        <th scope="row"><%= i + 1 %></th>
+        <td><a href="/player/<%= ratings[i].id %>/<%= currentYear %>"><%= ratings[i].name %></a></td>
+        <td><%= ratings[i].game1 %></td>
+        <td><%= ratings[i].game2 %></td>
+        <td><%= ratings[i].game3 %></td>
+        <td><%= ratings[i].game4 %></td>
+        <td><%= ratings[i].game5 %></td>
+        <td><a href="/math/<%= ratings[i].id %>/<%= currentYear %>"><%= ratings[i].points %></a></td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>

@@ -29,14 +29,14 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th style ="word-break:break-all;">Date</th>
-                        <th style ="word-break:break-all;">Game</th>
-                        <th style ="word-break:break-all;">Team</th>
-                        <th style ="word-break:break-all;">Result</th>
-                        <th style ="word-break:break-all;">Goals</th>
-                        <th style ="word-break:break-all;">Asists</th>
-                        <th style ="word-break:break-all;">Own goals</th>
-                        <th>G+A</th>
+                        <th style ="word-break:break-all;">D</th>
+                        <th style ="word-break:break-all;">M</th>
+                        <th style ="word-break:break-all;">T</th>
+                        <th style ="word-break:break-all;">R</th>
+                        <th style ="word-break:break-all;">G</th>
+                        <th style ="word-break:break-all;">A</th>
+                        <th style ="word-break:break-all;">OG</th>
+                        <th style ="word-break:break-all;">G+A</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -98,6 +98,18 @@
                     <% } %>
                     </tbody>
                 </table>
+            </div>
+            <div class="panel-footer">
+                <b>D</b> - Date,
+                <b>M</b> - Match title,
+                <b>T</b> - Team,
+                <b>R</b> - result,
+                (<span class="glyphicon glyphicon-ok-sign color-win"></span> - win,
+                <span class="glyphicon glyphicon-remove-sign color-loss"></span> - loss
+                <span class="glyphicon glyphicon-minus-sign color-draw"></span> - draw),
+                <b>G</b> - Goals scored,
+                <b>A</b> - Assists,
+                <b>OG</b> - Own goals
             </div>
         </div>
     </div>

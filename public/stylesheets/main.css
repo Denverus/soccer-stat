@@ -168,3 +168,23 @@
     width: 56px;
     height: 24px;
 }
+
+.icon-in {
+    background: url(../images/in.png);
+    background-size: cover;
+}
+
+.icon-in.normal {
+    width: 16px;
+    height: 16px;
+}
+
+.icon-out {
+    background: url(../images/out.png);
+    background-size: cover;
+}
+
+.icon-out.normal {
+    width: 16px;
+    height: 16px;
+}

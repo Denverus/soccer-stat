@@ -4,8 +4,8 @@
     <li class="list-group-item">
         <% if (events[i].type == null) { %>
             <%= events[i].score %>
-            <span class="icon-event icon-goal normal left" style="margin-right: 5px;"></span>
-            <span class="icon-tshirt icon-<%= events[i].team %> normal right"></span>
+            <span class="icon-event icon-goal normal left" style="margin-right: 5px;" title="Goal"></span>
+            <span class="icon-tshirt icon-<%= events[i].team %> normal right" title="<%= events[i].team %>"></span>
             <a href="/player/<%= events[i].author %>/<%= currentYear %>"><%= events[i].author %></a>
             <% if (events[i].assist != null) { %>
             <a href="/player/<%= events[i].assist %>/<%= currentYear %>">(<%= events[i].assist %>)</a>
@@ -14,16 +14,28 @@
 
         <% if (events[i].type == 'owngoal') { %>
             <%= events[i].score %>
-            <span class="icon-event icon-own-goal normal left" style="margin-right: 5px;"></span>
-            <span class="icon-tshirt icon-<%= events[i].team %> normal right"></span>
+            <span class="icon-event icon-own-goal normal left" style="margin-right: 5px;"  title="Own goal"></span>
+            <span class="icon-tshirt icon-<%= events[i].team %> normal right" title="<%= events[i].team %>"></span>
             <a href="/player/<%= events[i].author %>/<%= currentYear %>"><%= events[i].author %></a>
             (own goal)
         <% } %>
 
         <% if (events[i].type == 'transfer') { %>
-            <span class="icon-event icon-transfer normal left" style="margin-right: 5px;"></span>
+            <span class="icon-event icon-transfer normal left" style="margin-right: 5px;"  title="Transfer"></span>
             <a href="/player/<%= events[i].player %>/<%= currentYear %>"><%= events[i].player %></a>
-            <span class="icon-event icon-transfer-<%= events[i].from %>-<%= events[i].to %> normal right"></span>
+            <span class="icon-event icon-transfer-<%= events[i].from %>-<%= events[i].to %> normal right" title="From <%= events[i].from %> to <%= events[i].to %>"></span>
+        <% } %>
+
+        <% if (events[i].type == 'in') { %>
+        <span class="icon-event icon-in normal left" style="margin-right: 5px;" title="In"></span>
+        <a href="/player/<%= events[i].player %>/<%= currentYear %>"><%= events[i].player %></a>
+        <span class="icon-tshirt icon-<%= events[i].team %> normal right" title="<%= events[i].team %>"></span>
+        <% } %>
+
+        <% if (events[i].type == 'out') { %>
+        <span class="icon-event icon-out normal left" style="margin-right: 5px;" title="Out"></span>
+        <a href="/player/<%= events[i].player %>/<%= currentYear %>"><%= events[i].player %></a>
+        <span class="icon-tshirt icon-<%= events[i].team %> normal right" title="<%= events[i].team %>"></span>
         <% } %>
     </li>
     <% } %>

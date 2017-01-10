@@ -537,9 +537,14 @@ loadPlayerProfile = function (year, playerId, response) {
             }
         }
 
+        
+        var picture_path = __dirname+'/public/images/players/'+player.name+'.jpg';
+
+        console.log('Folder ', picture_path);
+        
         // profile picture checking
-        if (fs.existsSync(express.static(__dirname + '/public') + '/images/players/'+player+'.jpg')) {
-            player.img = '/images/players/'+player+'.jpg';
+        if (fs.existsSync(picture_path)) {
+            player.img = '/images/players/'+player.name+'.jpg';
         } else {
             player.img = '/images/players/'+'none.jpg';
         }

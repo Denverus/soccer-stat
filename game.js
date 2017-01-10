@@ -1,5 +1,6 @@
 var firebase = require('./firebase');
 var async = require('async');
+var fs = require('fs');
 
 var games_brunch = '/games_new';
 
@@ -534,6 +535,18 @@ loadPlayerProfile = function (year, playerId, response) {
 
                 player.games.push(game);
             }
+        }
+
+        
+        var picture_path = __dirname+'/public/images/players/'+player.name+'.jpg';
+
+        console.log('Folder ', picture_path);
+        
+        // profile picture checking
+        if (fs.existsSync(picture_path)) {
+            player.img = '/images/players/'+player.name+'.jpg';
+        } else {
+            player.img = '/images/players/'+'none.jpg';
         }
 
         player.games.sort(function (a, b) {

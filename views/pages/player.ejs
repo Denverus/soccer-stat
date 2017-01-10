@@ -12,104 +12,121 @@
 
 <div id="main" class="container">
 
-    <div class="col-md-12 col-xs-12">
-        <h1><%= player.name %></h1>
+    <div class="row">
+        <div class="col-xs-6 col-md-3">
+            <a href="#" class="thumbnail">
+                <img src="<%= player.img %>" alt="<%= player.name %>">
+            </a>
+        </div>
 
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title">
-                Games: <span class="badge"><%= player.summary.games %></span>
-                Wins: <span class="badge"><%= player.summary.wins %></span>
-                Draws: <span class="badge"><%= player.summary.draws %></span>
-                Losses: <span class="badge"><%= player.summary.losses %></span>
-                </h3>
-            </div>
-            <div class="panel-body">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th style ="word-break:break-all;">D</th>
-                        <th style ="word-break:break-all;">M</th>
-                        <th style ="word-break:break-all;">T</th>
-                        <th style ="word-break:break-all;">R</th>
-                        <th style ="word-break:break-all;">G</th>
-                        <th style ="word-break:break-all;">A</th>
-                        <th style ="word-break:break-all;">OG</th>
-                        <th style ="word-break:break-all;">G+A</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th><%= player.summary.goals %></th>
-                        <th><%= player.summary.assists %></th>
-                        <th><%= player.summary.ownGoals %></th>
-                        <th><%= player.summary.glas %></th>
-                    </tr>
-                    <% for(var i = 0; i < player.games.length; i++) { %>
-                    <tr>
-                        <td><%= player.games[i].num %></td>
-                        <td><%= player.games[i].date %></td>
-                        <td><a href="/game/<%= currentYear %>/<%= player.games[i].gameId %>"><%= player.games[i].game %></a></td>
-                        <td>
-                            <% var team = player.games[i].team %>
-                            <% if (team != null) { %>
-                            <span class="icon-tshirt icon-<%= team %> normal"></span>
-                            <% } %>
-                        </td>
-                        <td>
-                            <% var win = player.games[i].win %>
-                            <% if (win == 1) { %>
-                            <span class="glyphicon glyphicon-ok-sign color-win"></span>
-                            <% } %>
-                            <% if (win == -1) { %>
-                            <span class="glyphicon glyphicon-remove-sign color-loss"></span>
-                            <% } %>
-                            <% if (win == 0) { %>
-                            <span class="glyphicon glyphicon-minus-sign color-draw"></span>
-                            <% } %>
-                        </td>
-                        <td>
-                            <% if (team != null) { %>
-                            <%= player.games[i].goals %>
-                            <% } %>
-                        </td>
-                        <td>
-                            <% if (team != null) { %>
-                            <%= player.games[i].assists %>
-                            <% } %>
-                        </td>
-                        <td>
-                            <% if (team != null) { %>
-                            <%= player.games[i].ownGoals %>
-                            <% } %>
-                        </td>
-                        <td>
-                            <% if (team != null) { %>
-                            <%= player.games[i].glas %>
-                            <% } %>
-                        </td>
-                    </tr>
-                    <% } %>
-                    </tbody>
-                </table>
-            </div>
-            <div class="panel-footer">
-                <b>D</b> - Date,
-                <b>M</b> - Match title,
-                <b>T</b> - Team,
-                <b>R</b> - result,
-                (<span class="glyphicon glyphicon-ok-sign color-win"></span> - win,
-                <span class="glyphicon glyphicon-remove-sign color-loss"></span> - loss
-                <span class="glyphicon glyphicon-minus-sign color-draw"></span> - draw),
-                <b>G</b> - Goals scored,
-                <b>A</b> - Assists,
-                <b>OG</b> - Own goals
+        <div class="col-md-4 col-xs-6">
+            <img scr="/images/players/<%= player.name %>">
+
+            <h3>Name: <%= player.name %><h3>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Games: <span class="badge"><%= player.summary.games %></span>
+                        Wins: <span class="badge"><%= player.summary.wins %></span>
+                        Draws: <span class="badge"><%= player.summary.draws %></span>
+                        Losses: <span class="badge"><%= player.summary.losses %></span>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th style="word-break:break-all;">D</th>
+                            <th style="word-break:break-all;">M</th>
+                            <th style="word-break:break-all;">T</th>
+                            <th style="word-break:break-all;">R</th>
+                            <th style="word-break:break-all;">G</th>
+                            <th style="word-break:break-all;">A</th>
+                            <th style="word-break:break-all;">OG</th>
+                            <th style="word-break:break-all;">G+A</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th><%= player.summary.goals %></th>
+                            <th><%= player.summary.assists %></th>
+                            <th><%= player.summary.ownGoals %></th>
+                            <th><%= player.summary.glas %></th>
+                        </tr>
+                        <% for(var i = 0; i < player.games.length; i++) { %>
+                        <tr>
+                            <td><%= player.games[i].num %></td>
+                            <td><%= player.games[i].date %></td>
+                            <td>
+                                <a href="/game/<%= currentYear %>/<%= player.games[i].gameId %>"><%= player.games[i].game %></a>
+                            </td>
+                            <td>
+                                <% var team = player.games[i].team %>
+                                <% if (team != null) { %>
+                                <span class="icon-tshirt icon-<%= team %> normal"></span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <% var win = player.games[i].win %>
+                                <% if (win == 1) { %>
+                                <span class="glyphicon glyphicon-ok-sign color-win"></span>
+                                <% } %>
+                                <% if (win == -1) { %>
+                                <span class="glyphicon glyphicon-remove-sign color-loss"></span>
+                                <% } %>
+                                <% if (win == 0) { %>
+                                <span class="glyphicon glyphicon-minus-sign color-draw"></span>
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (team != null) { %>
+                                <%= player.games[i].goals %>
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (team != null) { %>
+                                <%= player.games[i].assists %>
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (team != null) { %>
+                                <%= player.games[i].ownGoals %>
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (team != null) { %>
+                                <%= player.games[i].glas %>
+                                <% } %>
+                            </td>
+                        </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="panel-footer">
+                    <b>D</b> - Date,
+                    <b>M</b> - Match title,
+                    <b>T</b> - Team,
+                    <b>R</b> - result,
+                    (<span class="glyphicon glyphicon-ok-sign color-win"></span> - win,
+                    <span class="glyphicon glyphicon-remove-sign color-loss"></span> - loss
+                    <span class="glyphicon glyphicon-minus-sign color-draw"></span> - draw),
+                    <b>G</b> - Goals scored,
+                    <b>A</b> - Assists,
+                    <b>OG</b> - Own goals
+                </div>
             </div>
         </div>
     </div>

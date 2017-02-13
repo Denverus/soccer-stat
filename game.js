@@ -245,11 +245,15 @@ loadOneGame = function (year, gameId, response) {
                 calcPlayerStatInGame(event, whiteSquad);
                 if (event.type == null) {
                     whiteGoals++;
+                } else if (event.type == 'owngoal') {
+                    whiteGoals++;
                 }
             }
             if (event.team == 'color') {
                 calcPlayerStatInGame(event, colorSquad);
                 if (event.type == null) {
+                    colorGoals++;
+                } else if (event.type == 'owngoal') {
                     colorGoals++;
                 }
             }

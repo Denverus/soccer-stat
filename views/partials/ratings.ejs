@@ -3,8 +3,8 @@
     <tr>
         <th>#</th>
         <th>Player</th>
-        <th>G1 * 0.5</th>
-        <th>G2 * 0.75</th>
+        <th>G1</th>
+        <th>G2</th>
         <th>G3</th>
         <th>G4</th>
         <th>G5</th>
@@ -14,14 +14,39 @@
     <tbody>
     <% for(var i = 0; i < ratings.length; i++) { %>
     <tr>
-        <th scope="row"><%= i + 1 %></th>
-        <td><a href="/player/<%= ratings[i].id %>/<%= currentYear %>"><%= ratings[i].name %></a></td>
-        <td><%= ratings[i].game1 %></td>
-        <td><%= ratings[i].game2 %></td>
-        <td><%= ratings[i].game3 %></td>
-        <td><%= ratings[i].game4 %></td>
-        <td><%= ratings[i].game5 %></td>
-        <td><a href="/math/<%= ratings[i].id %>/<%= currentYear %>"><%= ratings[i].points %></a></td>
+        <% var player_rating = ratings[i]; %>
+
+        <%# Place %>
+        <th scope="row"><%= i + 1 %>
+            <% if (player_rating.progress_place.indexOf('+') > -1) { %>
+                <span style="color:#00FF00;"><%= player_rating.progress_place %></span>
+            <% } %>
+            <% if (player_rating.progress_place.indexOf('-') > -1) { %>
+                <span style="color:#FF0000;"><%= player_rating.progress_place %></span>
+            <% } %>
+        </th>
+
+        <td><a href="/player/<%= player_rating.id %>/<%= currentYear %>"><%= player_rating.name %></a></td>
+
+        <% var points_by_game = player_rating.points_by_game; %>
+        <% for(var j = 0; j < points_by_game.length; j++) { %>
+            <td>
+                <%= points_by_game[j].points %>
+                <% if (points_by_game[j].original_points != null) { %>
+                    &nbsp;<span style="color:#FF0000;"><s><%= points_by_game[j].original_points %></s></span>
+                <% } %>
+            </td>
+        <% } %>
+
+        <td>
+            <a href="/math/<%= ratings[i].id %>/<%= currentYear %>"><%= ratings[i].points %></a>
+            <% if (player_rating.progress_place.indexOf('+') > -1) { %>
+                <span style="color:#00FF00;"><%= player_rating.progress_point %></span>
+            <% } %>
+            <% if (player_rating.progress_place.indexOf('-') > -1) { %>
+                <span style="color:#FF0000;"><%= player_rating.progress_point %></span>
+            <% } %>
+        </td>
     </tr>
     <% } %>
     </tbody>

@@ -18,9 +18,7 @@
         <div class="panel panel-primary">
             <div class="panel-heading">
                 <h3 class="panel-title">
-                Wins: <span class="badge"><%= math.wins %></span>
-                Draws: <span class="badge"><%= math.draws %></span>
-                Played: <span class="badge"><%= math.played %></span>
+                    Overall: <span class="badge"><%= math.points %> pts.</span>
                 </h3>
             </div>
             <div class="panel-body">
@@ -28,14 +26,18 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th style ="word-break:break-all;">D</th>
-                        <th style ="word-break:break-all;">M</th>
+                        <th style ="word-break:break-all;">Date</th>
+                        <th style ="word-break:break-all;">Game</th>
                         <th style ="word-break:break-all;">T</th>
                         <th style ="word-break:break-all;">R</th>
-                        <th style ="word-break:break-all;">G</th>
-                        <th style ="word-break:break-all;">A</th>
-                        <th style ="word-break:break-all;">OG</th>
-                        <th style ="word-break:break-all;">G+A</th>
+                        <th style ="word-break:break-all;">Base</th>
+                        <th style ="word-break:break-all;">Win</th>
+                        <th style ="word-break:break-all;">Draw</th>
+                        <th style ="word-break:break-all;">Scored</th>
+                        <th style ="word-break:break-all;">Assist</th>
+                        <th style ="word-break:break-all;">TS</th>
+                        <th style ="word-break:break-all;">TC</th>
+                        <th style ="word-break:break-all;">P</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -52,6 +54,7 @@
                     </tr>
                     <% for(var i = 0; i < math.games.length; i++) { %>
                     <tr>
+                        <td><%= i+1 %></td>
                         <td><%= math.games[i].date %></td>
                         <td><a href="/game/<%= currentYear %>/<%= math.games[i].url %>"><%= math.games[i].title %></a></td>
                         <td>
@@ -72,19 +75,19 @@
                             <span class="glyphicon glyphicon-minus-sign color-draw"></span>
                             <% } %>
                         </td>
+                        <% var points_by_cat = math.games[i].points_by_cat; %>
+                        <% for(var j = 0; j < points_by_cat.length; j++) { %>
+                            <td>
+                                <%= points_by_cat[j].points %>
+                                <% if (points_by_cat[j].factor != null) { %>
+                                     x <%= points_by_cat[j].factor %>
+                                <% } %>
+                            </td>
+                        <% } %>
+
                         <td>
                             <% if (team != null) { %>
-                            <%= math.games[i].goals %>
-                            <% } %>
-                        </td>
-                        <td>
-                            <% if (team != null) { %>
-                            <%= math.games[i].assists %>
-                            <% } %>
-                        </td>
-                        <td>
-                            <% if (team != null) { %>
-                            <%= math.games[i].own_goals %>
+                            <%= math.games[i].points %>
                             <% } %>
                         </td>
                         <td>
@@ -92,6 +95,21 @@
                         </td>
                     </tr>
                     <% } %>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th><%= math.points %></th>
+                    </tr>
                     </tbody>
                 </table>
             </div>

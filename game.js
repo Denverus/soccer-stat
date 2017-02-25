@@ -1042,42 +1042,84 @@ loadRatings = function (response) {
         {
             id: 'denis',
             name: 'denis',
-            game1: 10,
-            game2: 11,
-            game3: 12,
-            game4: 13,
-            game5: 14,
+            points_by_game: [
+                {
+                    points: 5,
+                    original_points : 10
+                },
+                {
+                    points: 15,
+                    original_points : 20
+                },
+                {
+                    points: 25
+                },
+                {
+                    points: 13
+                },
+                {
+                    points: 14
+                },
+            ],
             points: 55,
-            progress_place: 5,
-            progress_point: 10
+            progress_place: "+1",
+            progress_point: "+6"
         }
     );
     ratings.push(
         {
             id: 'vadim',
             name: 'vadim',
-            game1: 10,
-            game2: 11,
-            game3: 12,
-            game4: 13,
-            game5: 14,
+            points_by_game: [
+                {
+                    points: 5,
+                    original_points : 10
+                },
+                {
+                    points: 15,
+                    original_points : 20
+                },
+                {
+                    points: 25
+                },
+                {
+                    points: 13
+                },
+                {
+                    points: 14
+                },
+            ],
             points: 52,
-            progress_place: 5,
-            progress_point: 10
+            progress_place: "-1",
+            progress_point: "-4"
         }
     );
     ratings.push(
         {
             id: 'max',
             name: 'max',
-            game1: 10,
-            game2: 11,
-            game3: 12,
-            game4: 13,
-            game5: 14,
+            points_by_game: [
+                {
+                    points: 5,
+                    original_points : 10
+                },
+                {
+                    points: 15,
+                    original_points : 20
+                },
+                {
+                    points: 25
+                },
+                {
+                    points: 13
+                },
+                {
+                    points: 14
+                },
+            ],
             points: 51,
-            progress_place: 5,
-            progress_point: 10
+            progress_place: "0",
+            progress_point: "+5"
         }
     );
     response(ratings);
@@ -1090,9 +1132,7 @@ loadRatingsMath = function (player, response) {
             name: 'denis',
             id: 'denis'
         },
-        wins: 3,
-        draws: 1,
-        played: 5,
+        points: 1024,
         games: []
     };
     gamesStat.push(
@@ -1103,48 +1143,110 @@ loadRatingsMath = function (player, response) {
             played: true,
             team: 'white',
             win: true,
-            goals: 10,
-            own_goals: 11,
-            assists: 12,
-            team_scored: 13,
-            team_conceded: 14,
-            points: 55,
-            progress_place: 5,
-            progress_point: 10
+            points_by_cat: [
+                {
+                    points: 100
+                },
+                {
+                    points: 30
+                },
+                {
+                    points: 10
+                },
+                {
+                    points: 10,
+                    factor: 2
+                },
+                {
+                    points: 10,
+                    factor: 3
+                },
+                {
+                    points: 10,
+                    factor: 5
+                },
+                {
+                    points: 5,
+                    factor: 5
+                }
+            ],
+            points: 55
         }
     );
     gamesStat.push(
         {
-            date: '1-4-2017',
-            title: 'White - Color 1:3',
+            date: '1-6-2017',
+            title: 'White - Color 4:5',
             url: '2017/0102',
             played: true,
-            team: 'color',
-            goals: 10,
-            own_goals: 11,
-            assists: 12,
-            team_scored: 13,
-            team_conceded: 14,
-            points: 55,
-            progress_place: 5,
-            progress_point: 10
+            team: 'white',
+            win: true,
+            points_by_cat: [
+                {
+                    points: 100
+                },
+                {
+                    points: 30
+                },
+                {
+                    points: 10
+                },
+                {
+                    points: 10,
+                    factor: 2
+                },
+                {
+                    points: 10,
+                    factor: 3
+                },
+                {
+                    points: 10,
+                    factor: 5
+                },
+                {
+                    points: 5,
+                    factor: 5
+                }
+            ],
+            points: 55
         }
     );
     gamesStat.push(
         {
-            date: '1-2-2017',
-            title: 'White - Color 3:3',
+            date: '1-6-2017',
+            title: 'White - Color 4:5',
             url: '2017/0102',
             played: true,
-            team: 'color',
-            goals: 10,
-            own_goals: 11,
-            assists: 12,
-            team_scored: 13,
-            team_conceded: 14,
-            points: 55,
-            progress_place: 5,
-            progress_point: 10
+            team: 'white',
+            win: true,
+            points_by_cat: [
+                {
+                    points: 100
+                },
+                {
+                    points: 30
+                },
+                {
+                    points: 10
+                },
+                {
+                    points: 10,
+                    factor: 2
+                },
+                {
+                    points: 10,
+                    factor: 3
+                },
+                {
+                    points: 10,
+                    factor: 5
+                },
+                {
+                    points: 5,
+                    factor: 5
+                }
+            ],
+            points: 55
         }
     );
     math.games = gamesStat;

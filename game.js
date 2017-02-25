@@ -464,6 +464,93 @@ loadAllPlayersStat = function (year, order, response) {
     });
 }
 
+calcPLayerStatInGame = function (playerId, gameId, dbGame) {
+    var result = "White - Color " + dbGame.white.score + ":" + dbGame.color.score;
+
+    var game = {
+        num: dbGame.num,
+        date: dbGame.date,
+        time: 100,
+        game: result,
+        gameId: gameId,
+        team: null,
+        win: null,
+        goals: 0,
+        assists: 0,
+        ownGoals: 0,
+        glas: 0,
+        games: 0,
+        wins: 0,
+        draws: 0,
+        losses: 0,
+        team_scored: 0,
+        team_conceded: 0
+    };
+    var squadColor = dbGame.color.squad;
+    var squadWhite = dbGame.white.squad;
+    var whiteWon = 0;
+    var colorWon = 0;
+    var draw = 0;
+    if (dbGame.color.score > dbGame.white.score) {
+        colorWon = 1;
+    }
+    if (dbGame.color.score < dbGame.white.score) {
+        whiteWon = 1;
+    }
+    if (dbGame.color.score == dbGame.white.score) {
+        draw = 1;
+    }
+
+    var squadTime = {
+        color: calcPlayedTime(playerId, squadColor),
+        white: calcPlayedTime(playerId, squadWhite)
+    };
+
+    if (squadTime.white > 0 || squadTime.color > 0) {
+        game.games++;
+        if (squadTime.white > squadTime.color) {
+            game.team = 'white';
+            game.team_scored = dbGame.white.score;
+            game.team_conceded = dbGame.color.score;
+        } else {
+            game.team = 'color';
+            game.team_scored = dbGame.color.score;
+            game.team_conceded = dbGame.white.score;
+        }
+    }
+
+    calcGameAttendanceStat(playerId, squadTime, squadColor, 'color', 'white', colorWon, whiteWon, draw, game);
+    calcGameAttendanceStat(playerId, squadTime, squadWhite, 'white', 'color', whiteWon, colorWon, draw, game);
+
+    var events = dbGame.events;
+    for (var eventProp in events) {
+        if (events.hasOwnProperty(eventProp)) {
+            var event = events[eventProp];
+
+            if (event.type == null) {
+                var author = event.author;
+                var assist = event.assist;
+
+                if (author == playerId) {
+                    game.goals++;
+                    game.glas++;
+                }
+
+                if (assist == playerId) {
+                    game.assists++;
+                    game.glas++;
+                }
+            }
+            if (event.type == 'owngoal') {
+                var author = event.author;
+                game.ownGoals++;
+            }
+        }
+    }
+
+    return game;
+}
+
 loadPlayerProfile = function (year, playerId, response) {
     firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
         var games = snapshot.val();
@@ -486,83 +573,16 @@ loadPlayerProfile = function (year, playerId, response) {
             if (games.hasOwnProperty(gameProp)) {
                 var dbGame = games[gameProp];
 
-                var result = "White - Color " + dbGame.white.score + ":" + dbGame.color.score;
+                var game = calcPLayerStatInGame(playerId, gameProp, dbGame);
 
-                var game = {
-                    num: dbGame.num,
-                    date: dbGame.date,
-                    time: 100,
-                    game: result,
-                    gameId: gameProp,
-                    team: null,
-                    win: null,
-                    goals: 0,
-                    assists: 0,
-                    ownGoals: 0,
-                    glas: 0
-                };
-                var squadColor = dbGame.color.squad;
-                var squadWhite = dbGame.white.squad;
-                var whiteWon = 0;
-                var colorWon = 0;
-                var draw = 0;
-                if (dbGame.color.score > dbGame.white.score) {
-                    colorWon = 1;
-                }
-                if (dbGame.color.score < dbGame.white.score) {
-                    whiteWon = 1;
-                }
-                if (dbGame.color.score == dbGame.white.score) {
-                    draw = 1;
-                }
-
-                var squadTime = {
-                    color: calcPlayedTime(playerId, squadColor),
-                    white: calcPlayedTime(playerId, squadWhite)
-                };
-
-                if (squadTime.white > 0 || squadTime.color > 0) {
-                    player.summary.games++;
-                    if (squadTime.white > squadTime.color) {
-                        game.team = 'white';
-                    } else {
-                        game.team = 'color';
-                    }
-                }
-
-                calcGameAttendanceStat(playerId, squadTime, squadColor, 'color', 'white', colorWon, whiteWon, draw, player.summary, game);
-                calcGameAttendanceStat(playerId, squadTime, squadWhite, 'white', 'color', whiteWon, colorWon, draw, player.summary, game);
-
-                var events = dbGame.events;
-                for (var eventProp in events) {
-                    if (events.hasOwnProperty(eventProp)) {
-                        var event = events[eventProp];
-
-                        if (event.type == null) {
-                            var author = event.author;
-                            var assist = event.assist;
-
-                            if (author == playerId) {
-                                player.summary.goals++;
-                                game.goals++;
-                                player.summary.glas++;
-                                game.glas++;
-                            }
-
-                            if (assist == playerId) {
-                                player.summary.assists++;
-                                game.assists++;
-                                player.summary.glas++;
-                                game.glas++;
-                            }
-                        }
-                        if (event.type == 'owngoal') {
-                            var author = event.author;
-                            player.summary.ownGoals++;
-                            game.ownGoals++;
-                        }
-                    }
-                }
+                player.summary.goals += game.goals;
+                player.summary.assists+= game.assists;
+                player.summary.glas += game.glas;
+                player.summary.ownGoals += game.ownGoals;
+                player.summary.games += game.games;
+                player.summary.wins += game.wins;
+                player.summary.draws += game.draws;
+                player.summary.losses += game.losses;
 
                 player.games.push(game);
             }
@@ -607,19 +627,19 @@ allPlayersFromGame = function (game) {
     return players;
 }
 
-calcGameAttendanceStat = function (playerId, squadTime, squad, teamname, oppositeTeam, teamWon, opppositeWon, draw, summary, game) {
+calcGameAttendanceStat = function (playerId, squadTime, squad, teamname, oppositeTeam, teamWon, oppositeWon, draw, game) {
     var result = 0;
     for (var squadProp in squad) {
         if (squad.hasOwnProperty(squadProp)) {
             var playerInSquad = squad[squadProp];
             if (squadProp == playerId) {
                 if (squadTime[teamname] > squadTime[oppositeTeam]) {
-                    summary.wins += teamWon;
-                    summary.draws += draw;
-                    summary.losses += opppositeWon;
+                    game.wins += teamWon;
+                    game.draws += draw;
+                    game.losses += oppositeWon;
                     if (teamWon > 0) {
                         game.win = 1;
-                    } else if (opppositeWon > 0) {
+                    } else if (oppositeWon > 0) {
                         game.win = -1;
                     } else if (draw) {
                         game.win = 0
@@ -1125,7 +1145,120 @@ loadRatings = function (response) {
     response(ratings);
 }
 
+getLastGames = function(count, response) {
+    var year = '2017';
+    firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
+        var games = snapshot.val();
+        var gamesIndexArray = Object.keys(games);
+        var gamesArray = [];
+        var i = 0;
+        for (var gameKey in gamesIndexArray) {
+            var gameId = gamesIndexArray[gameKey];
+            var game = games[gameId];
+            game.year = year;
+            game.id = gameId;
+            gamesArray.push(game);
+        }
+        gamesArray.sort(function (a, b) {
+            return b.id.localeCompare(a.id);
+        });
+
+        var ar2 = gamesArray.slice(0, count);
+        response(ar2);
+    });
+}
+
 loadRatingsMath = function (player, response) {
+
+    const POINTS_FOR_ATTENDANCE = 100;
+    const POINTS_FOR_WIN = 30;
+    const POINTS_FOR_DRAW = 10;
+    const POINTS_FOR_GOAL = 10;
+    const POINTS_FOR_ASSIST = 10;
+    const POINTS_FOR_TEAM_GOAL = 10;
+    const POINTS_FOR_TEAM_CONCEDED = 5;
+    const FACTOR_4TH_GAME = 0.75;
+    const FACTOR_5TH_GAME = 0.5;
+
+    getLastGames(5, function(games) {
+        var gamesStat = [];
+        var points_summary = 0;
+        var game_index = 0;
+        for (var gameId in games) {
+            var game = games[gameId];
+
+            var gameStat = calcPLayerStatInGame(player, gameId, game);
+
+            var points_for_result = gameStat.wins * POINTS_FOR_WIN + gameStat.draws * POINTS_FOR_DRAW;
+
+            var points = gameStat.games * POINTS_FOR_ATTENDANCE +
+                points_for_result +
+                gameStat.goals * POINTS_FOR_GOAL +
+                gameStat.assists * POINTS_FOR_ASSIST +
+                gameStat.team_scored * POINTS_FOR_TEAM_GOAL -
+                gameStat.team_conceded * POINTS_FOR_TEAM_CONCEDED;
+
+            var original_points = null;
+
+            if (game_index == 3) {
+                original_points = points;
+                points = Math.round(points * FACTOR_4TH_GAME);
+            }
+            if (game_index == 4) {
+                original_points = points;
+                points = Math.round(points * FACTOR_5TH_GAME);
+            }
+
+            points_summary += points;
+
+            gamesStat.push(
+                {
+                    date: game.date,
+                    title: 'White - Color '+game.white.score+':'+game.color.score,
+                    url: game.id,
+                    played: true,
+                    team: gameStat.team,
+                    win: gameStat.win,
+                    points_by_cat: [
+                        {
+                            points: gameStat.games * POINTS_FOR_ATTENDANCE
+                        },
+                        {
+                            points: points_for_result
+                        },
+                        {
+                            points: gameStat.goals * POINTS_FOR_GOAL
+                        },
+                        {
+                            points: gameStat.assists * POINTS_FOR_ASSIST
+                        },
+                        {
+                            points: gameStat.team_scored * POINTS_FOR_TEAM_GOAL
+                        },
+                        {
+                            points: gameStat.team_conceded * POINTS_FOR_TEAM_CONCEDED
+                        }
+                    ],
+                    points: points,
+                    original_points: original_points
+                }
+            );
+            game_index++;
+        }
+        var math = {
+            player: {
+                name: player,
+                id: player
+            },
+            points: points_summary,
+            games: []
+        };
+        math.games = gamesStat;
+        response(math);
+    });
+}
+
+loadRatingsMath1 = function (player, response) {
     var gamesStat = [];
     var math = {
         player: {
@@ -1246,7 +1379,8 @@ loadRatingsMath = function (player, response) {
                     factor: 5
                 }
             ],
-            points: 55
+            points: 55,
+            original_points: 75
         }
     );
     math.games = gamesStat;

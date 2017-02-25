@@ -87,7 +87,13 @@
 
                         <td>
                             <% if (team != null) { %>
-                            <%= math.games[i].points %>
+                                <% if (math.games[i].original_points != null) { %>
+                                    <s><%= math.games[i].original_points %></s>
+                                    <span style="color:#FF0000;"><b><%= math.games[i].points %></b></span>
+                                <% } %>
+                                <% if (math.games[i].original_points == null) { %>
+                                    <b><%= math.games[i].points %></b>
+                                <% } %>
                             <% } %>
                         </td>
                         <td>

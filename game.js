@@ -1175,9 +1175,9 @@ loadRatingsMath = function (player, response) {
 }
 
 calcPlayerRatingDetail = function (player, games) {
-    const POINTS_FOR_ATTENDANCE = 100;
-    const POINTS_FOR_WIN = 60;
-    const POINTS_FOR_DRAW = 20;
+    const POINTS_FOR_LOSE = 100;
+    const POINTS_FOR_WIN = 160;
+    const POINTS_FOR_DRAW = 120;
     const POINTS_FOR_GOAL = 10;
     const POINTS_FOR_ASSIST = 10;
     const POINTS_FOR_TEAM_GOAL = 10;
@@ -1193,10 +1193,10 @@ calcPlayerRatingDetail = function (player, games) {
 
         var gameStat = calcPLayerStatInGame(player, gameId, game);
 
-        var points_for_result = gameStat.wins * POINTS_FOR_WIN + gameStat.draws * POINTS_FOR_DRAW;
+        var points_for_result = gameStat.wins * POINTS_FOR_WIN + gameStat.draws * POINTS_FOR_DRAW
+            + gameStat.losses * POINTS_FOR_LOSE;
 
-        var points = gameStat.games * POINTS_FOR_ATTENDANCE +
-            points_for_result +
+        var points = points_for_result +
             gameStat.goals * POINTS_FOR_GOAL +
             gameStat.assists * POINTS_FOR_ASSIST +
             gameStat.team_scored * POINTS_FOR_TEAM_GOAL -
@@ -1225,9 +1225,6 @@ calcPlayerRatingDetail = function (player, games) {
                 win: gameStat.win,
                 points_by_cat: [
                     {
-                        points: gameStat.games * POINTS_FOR_ATTENDANCE
-                    },
-                    {
                         points: points_for_result
                     },
                     {
@@ -1250,6 +1247,15 @@ calcPlayerRatingDetail = function (player, games) {
         game_index++;
     }
     var math = {
+        rules: {
+            points_for_lose : POINTS_FOR_LOSE,
+            points_for_draw: POINTS_FOR_DRAW,
+            points_for_win: POINTS_FOR_WIN,
+            points_for_team_goal: POINTS_FOR_TEAM_GOAL,
+            points_for_team_goal_conc: POINTS_FOR_TEAM_CONCEDED,
+            points_for_goal: POINTS_FOR_GOAL,
+            points_for_assist: POINTS_FOR_ASSIST
+        },
         player: {
             name: player,
             id: player

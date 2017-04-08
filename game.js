@@ -13,6 +13,11 @@ module.exports = {
                         callback(null, game);
                     });
                 },
+                ratings: function (callback) {
+                    loadRatings(function (ratings) {
+                        callback(null, ratings);
+                    });
+                },
                 gameList: function (callback) {
                     loadAllGames(year, function (allGames) {
                         callback(null, allGames);

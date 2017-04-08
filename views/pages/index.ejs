@@ -37,6 +37,17 @@
             <div class="panel-footer"><a href="/games/<%= currentYear %>" class="navbar-link">All games</a></div>
         </div>
     </div>
+
+    <div class="col-md-3 col-xs-12">
+        <div class="panel panel-info">
+            <div class="panel-heading"><h3 class="panel-title">Ratings</h3></div>
+            <div class="panel-body">
+                <% var full_ratings = false; %>
+                <% include ../partials/ratings.ejs %>
+            </div>
+            <div class="panel-footer"><a href="/ratings/<%= currentYear %>" class="navbar-link">Full ratings</a></div>
+        </div>
+    </div>
     
     <div class="col-md-3 col-xs-12">
         <div class="panel panel-info">

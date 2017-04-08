@@ -76,6 +76,7 @@ app.get('/', function (request, response) {
         var uiData = {
             lastGame: data.lastGame,
             games: data.gameList,
+            ratings: data.ratings,
             scorers: data.scorers,
             assists: data.assists,
             glas: data.glas,

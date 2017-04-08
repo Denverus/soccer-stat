@@ -3,16 +3,22 @@
     <tr>
         <th>#</th>
         <th>Player</th>
-        <th>G1</th>
-        <th>G2</th>
-        <th>G3</th>
-        <th>G4</th>
-        <th>G5</th>
+        <% if (full_ratings) { %>
+            <th>G1</th>
+            <th>G2</th>
+            <th>G3</th>
+            <th>G4</th>
+            <th>G5</th>
+        <% } %>
         <th>P</th>
     </tr>
     </thead>
     <tbody>
-    <% for(var i = 0; i < ratings.length; i++) { %>
+    <% var max = 5; %>
+    <% if (full_ratings || max > ratings.length) { %>
+    <% max = ratings.length; %>
+    <% } %>
+    <% for(var i = 0; i < max; i++) { %>
     <tr>
         <% var player_rating = ratings[i]; %>
 
@@ -28,14 +34,16 @@
 
         <td><a href="/player/<%= player_rating.id %>/<%= currentYear %>"><%= player_rating.name %></a></td>
 
-        <% var points_by_game = player_rating.points_by_game; %>
-        <% for(var j = 0; j < points_by_game.length; j++) { %>
-            <td>
-                <%= points_by_game[j].points %>
-                <% if (points_by_game[j].original_points != null) { %>
-                    &nbsp;<span style="color:#FF0000;"><s><%= points_by_game[j].original_points %></s></span>
-                <% } %>
-            </td>
+        <% if (full_ratings) { %>
+            <% var points_by_game = player_rating.points_by_game; %>
+            <% for(var j = 0; j < points_by_game.length; j++) { %>
+                <td>
+                    <%= points_by_game[j].points %>
+                    <% if (points_by_game[j].original_points != null) { %>
+                        &nbsp;<span style="color:#FF0000;"><s><%= points_by_game[j].original_points %></s></span>
+                    <% } %>
+                </td>
+            <% } %>
         <% } %>
 
         <td>

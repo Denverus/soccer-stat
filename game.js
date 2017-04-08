@@ -1261,7 +1261,9 @@ calcPlayerRatingDetail = function (player, games) {
             points_for_team_goal: POINTS_FOR_TEAM_GOAL,
             points_for_team_goal_conc: POINTS_FOR_TEAM_CONCEDED,
             points_for_goal: POINTS_FOR_GOAL,
-            points_for_assist: POINTS_FOR_ASSIST
+            points_for_assist: POINTS_FOR_ASSIST,
+            points_reduction_game_4: 100 - FACTOR_4TH_GAME*100,
+            points_reduction_game_5: 100 - FACTOR_5TH_GAME*100
         },
         player: {
             name: player,

@@ -118,11 +118,13 @@
                 <b>R</b> - Result
                 (<span class="glyphicon glyphicon-ok-sign color-win"></span> - <%= math.rules.points_for_win %> pts for win,
                 <span class="glyphicon glyphicon-remove-sign color-loss"></span> - <%= math.rules.points_for_lose %> pts for loss,
-                <span class="glyphicon glyphicon-minus-sign color-draw"></span> - <%= math.rules.points_for_draw %> pts for loss),
+                <span class="glyphicon glyphicon-minus-sign color-draw"></span> - <%= math.rules.points_for_draw %> pts for draw),
                 <b>S</b> - <%= math.rules.points_for_goal %> pts for scored goal,
                 <b>A</b> - <%= math.rules.points_for_assist %> pts for assist goal,
                 <b>TS</b> - <%= math.rules.points_for_team_goal %> pts for team scored goal,
-                <b>TC</b> - <%= math.rules.points_for_team_goal_conc %> pts for team scored goal,
+                <b>TC</b> - <%= math.rules.points_for_team_goal_conc %> pts for team scored goal
+                <p>
+                Point reductions: <b>-<%= math.rules.points_reduction_game_4 %>%</b> from game #4 and <b>-<%= math.rules.points_reduction_game_5 %>%</b> from game #5.
             </div>
         </div>
     </div>

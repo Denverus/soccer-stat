@@ -543,7 +543,9 @@ calcPLayerStatInGame = function (playerId, gameId, dbGame) {
             }
             if (event.type == 'owngoal') {
                 var author = event.author;
-                game.ownGoals++;
+                if (playerId == author) {
+                    game.ownGoals++;
+                }
             }
         }
     }

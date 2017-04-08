@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Russian Soccer stat - Player</title>
+    <% include ../partials/header.ejs %>
+    <% include ../partials/counters.ejs %>
+</head>
+
+<body>
+
+<% include ../partials/nav.ejs %>
+
+<div id="main" class="container">
+
+    <div class="col-md-12 col-xs-12">
+        <h1><%= math.player.name %></h1>
+
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Overall: <span class="badge"><%= math.points %> pts.</span>
+                </h3>
+            </div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th style ="word-break:break-all;">Date</th>
+                        <th style ="word-break:break-all;">Game</th>
+                        <th style ="word-break:break-all;">T</th>
+                        <th style ="word-break:break-all;"></th>
+                        <th style ="word-break:break-all;">R</th>
+                        <th style ="word-break:break-all;">S</th>
+                        <th style ="word-break:break-all;">A</th>
+                        <th style ="word-break:break-all;">TS</th>
+                        <th style ="word-break:break-all;">TC</th>
+                        <th style ="word-break:break-all;">P</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    <% for(var i = 0; i < math.games.length; i++) { %>
+                    <tr>
+                        <td><%= i+1 %></td>
+                        <td><%= math.games[i].date %></td>
+                        <td><a href="/game/<%= currentYear %>/<%= math.games[i].url %>"><%= math.games[i].title %></a></td>
+                        <td>
+                            <% var team = math.games[i].team %>
+                            <% if (team != null) { %>
+                            <span class="icon-tshirt icon-<%= team %> normal"></span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% var win = math.games[i].win %>
+                            <% if (win == 1) { %>
+                            <span class="glyphicon glyphicon-ok-sign color-win"></span>
+                            <% } %>
+                            <% if (win == -1) { %>
+                            <span class="glyphicon glyphicon-remove-sign color-loss"></span>
+                            <% } %>
+                            <% if (win == 0) { %>
+                            <span class="glyphicon glyphicon-minus-sign color-draw"></span>
+                            <% } %>
+                        </td>
+                        <% var points_by_cat = math.games[i].points_by_cat; %>
+                        <% for(var j = 0; j < points_by_cat.length; j++) { %>
+                            <td>
+                                <%= points_by_cat[j].points %>
+                                <% if (points_by_cat[j].factor != null) { %>
+                                     x <%= points_by_cat[j].factor %>
+                                <% } %>
+                            </td>
+                        <% } %>
+
+                        <td>
+                            <% if (team != null) { %>
+                                <% if (math.games[i].original_points != null) { %>
+                                    <s><%= math.games[i].original_points %></s>
+                                    <span style="color:#FF0000;"><b><%= math.games[i].points %></b></span>
+                                <% } %>
+                                <% if (math.games[i].original_points == null) { %>
+                                    <b><%= math.games[i].points %></b>
+                                <% } %>
+                            <% } %>
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                    <% } %>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th><%= math.points %></th>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-footer">
+                <b>T</b> - Team,
+                <b>R</b> - Result
+                (<span class="glyphicon glyphicon-ok-sign color-win"></span> - <%= math.rules.points_for_win %> pts for win,
+                <span class="glyphicon glyphicon-remove-sign color-loss"></span> - <%= math.rules.points_for_lose %> pts for loss,
+                <span class="glyphicon glyphicon-minus-sign color-draw"></span> - <%= math.rules.points_for_draw %> pts for draw),
+                <b>S</b> - <%= math.rules.points_for_goal %> pts for scored goal,
+                <b>A</b> - <%= math.rules.points_for_assist %> pts for assist goal,
+                <b>TS</b> - <%= math.rules.points_for_team_goal %> pts for team scored goal,
+                <b>TC</b> - <%= math.rules.points_for_team_goal_conc %> pts for team scored goal
+                <p>
+                Point reductions: <b>-<%= math.rules.points_reduction_game_4 %>%</b> from game #4 and <b>-<%= math.rules.points_reduction_game_5 %>%</b> from game #5.
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>

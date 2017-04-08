@@ -14,6 +14,11 @@ module.exports = {
                         callback(null, game);
                     });
                 },
+                ratings: function (callback) {
+                    loadRatings(function (ratings) {
+                        callback(null, ratings);
+                    });
+                },
                 gameList: function (callback) {
                     loadAllGames(year, function (allGames) {
                         callback(null, allGames);
@@ -55,9 +60,9 @@ module.exports = {
         });
     },
     loadGamesPageData: function (year, response) {
-    	async.series({
+        async.series({
             games: function (callback) {
-            	loadAllGames(year, function (games) {
+                loadAllGames(year, function (games) {
                     callback(null, games);
                 });
             },
@@ -68,7 +73,7 @@ module.exports = {
             }
         }, function (err, results) {
             response(results);
-        });    	
+        });
     },
     loadOneGamePageData: function (year, gameId, response) {
         async.series({
@@ -155,6 +160,38 @@ module.exports = {
             response(trinity);
         });
     },
+    loadRatingsPageData: function (response) {
+        async.series({
+            ratings: function (callback) {
+                loadRatings(function (ratings) {
+                    callback(null, ratings);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
+                });
+            }
+        }, function (err, results) {
+            response(results);
+        });
+    },
+    loadRatingsMathPageData: function (player, response) {
+        async.series({
+            math: function (callback) {
+                loadRatingsMath(player, function (math) {
+                    callback(null, math);
+                });
+            },
+            years: function (callback) {
+                getListOfYears(function (years) {
+                    callback(null, years);
+                });
+            }
+        }, function (err, results) {
+            response(results);
+        });
+    },
     copyEvents: function () {
         //copyEvents();
     }
@@ -167,7 +204,7 @@ loadConfig = function (response) {
 }
 
 loadLastGameId = function (year, response) {
-    firebase.database.ref(games_brunch + '/'+year).once('value').then(function (snapshot) {
+    firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
         var games = snapshot.val();
         var gamesIndexArray = Object.keys(games);
         var gamesArray = [];
@@ -203,7 +240,7 @@ addStatFieldToPlayers = function (squad) {
     }
 }
 
-calcPlayerStatInGame = function(event, squad) {
+calcPlayerStatInGame = function (event, squad) {
     if (event.type == null) {
         var author = squad[event.author];
         var assist = squad[event.assist];
@@ -221,7 +258,7 @@ calcPlayerStatInGame = function(event, squad) {
 }
 
 loadOneGame = function (year, gameId, response) {
-    firebase.database.ref(games_brunch + '/'+year + '/' + gameId).once('value').then(function (snapshot) {
+    firebase.database.ref(games_brunch + '/' + year + '/' + gameId).once('value').then(function (snapshot) {
         var game = snapshot.val();
         game.id = gameId;
 
@@ -437,6 +474,95 @@ loadAllPlayersStat = function (year, order, response) {
     });
 }
 
+calcPLayerStatInGame = function (playerId, gameId, dbGame) {
+    var result = "White - Color " + dbGame.white.score + ":" + dbGame.color.score;
+
+    var game = {
+        num: dbGame.num,
+        date: dbGame.date,
+        time: 100,
+        game: result,
+        gameId: gameId,
+        team: null,
+        win: null,
+        goals: 0,
+        assists: 0,
+        ownGoals: 0,
+        glas: 0,
+        games: 0,
+        wins: 0,
+        draws: 0,
+        losses: 0,
+        team_scored: 0,
+        team_conceded: 0
+    };
+    var squadColor = dbGame.color.squad;
+    var squadWhite = dbGame.white.squad;
+    var whiteWon = 0;
+    var colorWon = 0;
+    var draw = 0;
+    if (dbGame.color.score > dbGame.white.score) {
+        colorWon = 1;
+    }
+    if (dbGame.color.score < dbGame.white.score) {
+        whiteWon = 1;
+    }
+    if (dbGame.color.score == dbGame.white.score) {
+        draw = 1;
+    }
+
+    var squadTime = {
+        color: calcPlayedTime(playerId, squadColor),
+        white: calcPlayedTime(playerId, squadWhite)
+    };
+
+    if (squadTime.white > 0 || squadTime.color > 0) {
+        game.games++;
+        if (squadTime.white > squadTime.color) {
+            game.team = 'white';
+            game.team_scored = dbGame.white.score;
+            game.team_conceded = dbGame.color.score;
+        } else {
+            game.team = 'color';
+            game.team_scored = dbGame.color.score;
+            game.team_conceded = dbGame.white.score;
+        }
+    }
+
+    calcGameAttendanceStat(playerId, squadTime, squadColor, 'color', 'white', colorWon, whiteWon, draw, game);
+    calcGameAttendanceStat(playerId, squadTime, squadWhite, 'white', 'color', whiteWon, colorWon, draw, game);
+
+    var events = dbGame.events;
+    for (var eventProp in events) {
+        if (events.hasOwnProperty(eventProp)) {
+            var event = events[eventProp];
+
+            if (event.type == null) {
+                var author = event.author;
+                var assist = event.assist;
+
+                if (author == playerId) {
+                    game.goals++;
+                    game.glas++;
+                }
+
+                if (assist == playerId) {
+                    game.assists++;
+                    game.glas++;
+                }
+            }
+            if (event.type == 'owngoal') {
+                var author = event.author;
+                if (playerId == author) {
+                    game.ownGoals++;
+                }
+            }
+        }
+    }
+
+    return game;
+}
+
 loadPlayerProfile = function (year, playerId, response) {
     firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
         var games = snapshot.val();
@@ -459,83 +585,16 @@ loadPlayerProfile = function (year, playerId, response) {
             if (games.hasOwnProperty(gameProp)) {
                 var dbGame = games[gameProp];
 
-                var result = "White - Color " + dbGame.white.score + ":" + dbGame.color.score;
+                var game = calcPLayerStatInGame(playerId, gameProp, dbGame);
 
-                var game = {
-                    num: dbGame.num,
-                    date: dbGame.date,
-                    time: 100,
-                    game: result,
-                    gameId: gameProp,
-                    team: null,
-                    win: null,
-                    goals: 0,
-                    assists: 0,
-                    ownGoals: 0,
-                    glas: 0
-                };
-                var squadColor = dbGame.color.squad;
-                var squadWhite = dbGame.white.squad;
-                var whiteWon = 0;
-                var colorWon = 0;
-                var draw = 0;
-                if (dbGame.color.score > dbGame.white.score) {
-                    colorWon = 1;
-                }
-                if (dbGame.color.score < dbGame.white.score) {
-                    whiteWon = 1;
-                }
-                if (dbGame.color.score == dbGame.white.score) {
-                    draw = 1;
-                }
-
-                var squadTime = {
-                    color: calcPlayedTime(playerId, squadColor),
-                    white: calcPlayedTime(playerId, squadWhite)
-                };
-
-                if (squadTime.white > 0 || squadTime.color > 0) {
-                    player.summary.games++;
-                    if (squadTime.white > squadTime.color) {
-                        game.team = 'white';
-                    } else {
-                        game.team = 'color';
-                    }
-                }
-
-                calcGameAttendanceStat(playerId, squadTime, squadColor, 'color', 'white', colorWon, whiteWon, draw, player.summary, game);
-                calcGameAttendanceStat(playerId, squadTime, squadWhite, 'white', 'color', whiteWon, colorWon, draw, player.summary, game);
-
-                var events = dbGame.events;
-                for (var eventProp in events) {
-                    if (events.hasOwnProperty(eventProp)) {
-                        var event = events[eventProp];
-
-                        if (event.type == null) {
-                            var author = event.author;
-                            var assist = event.assist;
-
-                            if (author == playerId) {
-                                player.summary.goals++;
-                                game.goals++;
-                                player.summary.glas++;
-                                game.glas++;
-                            }
-
-                            if (assist == playerId) {
-                                player.summary.assists++;
-                                game.assists++;
-                                player.summary.glas++;
-                                game.glas++;
-                            }
-                        }
-                        if (event.type == 'owngoal') {
-                            var author = event.author;
-                            player.summary.ownGoals++;
-                            game.ownGoals++;
-                        }
-                    }
-                }
+                player.summary.goals += game.goals;
+                player.summary.assists += game.assists;
+                player.summary.glas += game.glas;
+                player.summary.ownGoals += game.ownGoals;
+                player.summary.games += game.games;
+                player.summary.wins += game.wins;
+                player.summary.draws += game.draws;
+                player.summary.losses += game.losses;
 
                 player.games.push(game);
             }
@@ -592,19 +651,19 @@ allPlayersFromGame = function (game) {
     return players;
 }
 
-calcGameAttendanceStat = function (playerId, squadTime, squad, teamname, oppositeTeam, teamWon, opppositeWon, draw, summary, game) {
+calcGameAttendanceStat = function (playerId, squadTime, squad, teamname, oppositeTeam, teamWon, oppositeWon, draw, game) {
     var result = 0;
     for (var squadProp in squad) {
         if (squad.hasOwnProperty(squadProp)) {
             var playerInSquad = squad[squadProp];
             if (squadProp == playerId) {
                 if (squadTime[teamname] > squadTime[oppositeTeam]) {
-                    summary.wins += teamWon;
-                    summary.draws += draw;
-                    summary.losses += opppositeWon;
+                    game.wins += teamWon;
+                    game.draws += draw;
+                    game.losses += oppositeWon;
                     if (teamWon > 0) {
                         game.win = 1;
-                    } else if (opppositeWon > 0) {
+                    } else if (oppositeWon > 0) {
                         game.win = -1;
                     } else if (draw) {
                         game.win = 0
@@ -992,4 +1051,217 @@ copyEvents = function () {
     var fromRef = firebase.database.ref('games/');
     var toRef = firebase.database.ref('games_new/2016');
     //copyFbRecord(fromRef, toRef);
+}
+
+getPlayerList = function (games) {
+    var playerSet = new Map();
+    for (var gameKey in games) {
+        var game = games[gameKey];
+
+        var colorSquadArray = Object.keys(game.color.squad);
+        var whiteSquadArray = Object.keys(game.white.squad);
+
+        for (playerId in colorSquadArray) {
+            var player = colorSquadArray[playerId]
+            playerSet.set(player, player);
+        }
+        for (playerId in whiteSquadArray) {
+            var player = whiteSquadArray[playerId]
+            playerSet.set(player, player);
+        }
+    }
+    return playerSet;
+}
+
+calculatePlayersRatings = function (games) {
+    var playerMap = getPlayerList(games);
+    var ratings = [];
+    playerMap.forEach(function (value, player) {
+        var player_rating = calcPlayerRatingDetail(player, games);
+
+        var points_by_game = [];
+
+        player_rating.games.forEach(function (value) {
+            var game_points = {
+                points: value.points,
+                original_points: value.original_points
+            }
+
+            points_by_game.push(game_points);
+        });
+
+        ratings.push(
+            {
+                id: value,
+                name: value,
+                points_by_game: points_by_game,
+                points: player_rating.points,
+                progress_place: null,
+                progress_point: null
+            }
+        );
+    });
+    ratings.sort(function (a, b) {
+        return b.points - a.points;
+    });
+
+    return ratings;
+}
+
+loadRatings = function (response) {
+    getLastGames(6, function (games) {
+        var curGames = games.slice(0, 5);
+        var prevGames = games.slice(1, 6);
+        var curRatings = calculatePlayersRatings(curGames);
+        var prevRatings = calculatePlayersRatings(prevGames);
+
+        var position = 1;
+        curRatings.forEach(function (playerRating) {
+            var oldPosition = null;
+            var oldPoints = null;
+            for (var i = 0; i < prevRatings.length; i++) {
+                if (prevRatings[i].id == playerRating.id) {
+                    oldPosition = i + 1;
+                    oldPoints = prevRatings[i].points;
+                    break;
+                }
+            }
+
+            if (oldPosition != null) {
+                playerRating.progress_place = oldPosition - position;
+            }
+            if (oldPoints != null) {
+                playerRating.progress_point = Math.floor(oldPoints - playerRating.points);
+            }
+
+            position++;
+        });
+
+        response(curRatings);
+    });
+}
+
+getLastGames = function (count, response) {
+    var year = '2017';
+    firebase.database.ref(games_brunch + '/' + year).once('value').then(function (snapshot) {
+        var games = snapshot.val();
+        var gamesIndexArray = Object.keys(games);
+        var gamesArray = [];
+        var i = 0;
+        for (var gameKey in gamesIndexArray) {
+            var gameId = gamesIndexArray[gameKey];
+            var game = games[gameId];
+            game.year = year;
+            game.id = gameId;
+            gamesArray.push(game);
+        }
+        gamesArray.sort(function (a, b) {
+            return b.id.localeCompare(a.id);
+        });
+
+        var ar2 = gamesArray.slice(0, count);
+        response(ar2);
+    });
+}
+
+loadRatingsMath = function (player, response) {
+    getLastGames(5, function (games) {
+        var stat = calcPlayerRatingDetail(player, games);
+        response(stat);
+    });
+}
+
+calcPlayerRatingDetail = function (player, games) {
+    const POINTS_FOR_LOSE = 100;
+    const POINTS_FOR_WIN = 160;
+    const POINTS_FOR_DRAW = 120;
+    const POINTS_FOR_GOAL = 10;
+    const POINTS_FOR_ASSIST = 10;
+    const POINTS_FOR_TEAM_GOAL = 10;
+    const POINTS_FOR_TEAM_CONCEDED = 5;
+    const FACTOR_4TH_GAME = 0.75;
+    const FACTOR_5TH_GAME = 0.5;
+
+    var gamesStat = [];
+    var points_summary = 0;
+    var game_index = 0;
+    for (var gameId in games) {
+        var game = games[gameId];
+
+        var gameStat = calcPLayerStatInGame(player, gameId, game);
+
+        var points_for_result = gameStat.wins * POINTS_FOR_WIN + gameStat.draws * POINTS_FOR_DRAW
+            + gameStat.losses * POINTS_FOR_LOSE;
+
+        var points = points_for_result +
+            gameStat.goals * POINTS_FOR_GOAL +
+            gameStat.assists * POINTS_FOR_ASSIST +
+            gameStat.team_scored * POINTS_FOR_TEAM_GOAL -
+            gameStat.team_conceded * POINTS_FOR_TEAM_CONCEDED;
+
+        var original_points = null;
+
+        if (game_index == 3 && points > 0) {
+            original_points = points;
+            points = Math.round(points * FACTOR_4TH_GAME);
+        }
+        if (game_index == 4 && points > 0) {
+            original_points = points;
+            points = Math.round(points * FACTOR_5TH_GAME);
+        }
+
+        points_summary += points;
+
+        gamesStat.push(
+            {
+                date: game.date,
+                title: 'White - Color ' + game.white.score + ':' + game.color.score,
+                url: game.id,
+                played: true,
+                team: gameStat.team,
+                win: gameStat.win,
+                points_by_cat: [
+                    {
+                        points: points_for_result
+                    },
+                    {
+                        points: gameStat.goals * POINTS_FOR_GOAL
+                    },
+                    {
+                        points: gameStat.assists * POINTS_FOR_ASSIST
+                    },
+                    {
+                        points: gameStat.team_scored * POINTS_FOR_TEAM_GOAL
+                    },
+                    {
+                        points: gameStat.team_conceded * POINTS_FOR_TEAM_CONCEDED
+                    }
+                ],
+                points: points,
+                original_points: original_points
+            }
+        );
+        game_index++;
+    }
+    var math = {
+        rules: {
+            points_for_lose : POINTS_FOR_LOSE,
+            points_for_draw: POINTS_FOR_DRAW,
+            points_for_win: POINTS_FOR_WIN,
+            points_for_team_goal: POINTS_FOR_TEAM_GOAL,
+            points_for_team_goal_conc: POINTS_FOR_TEAM_CONCEDED,
+            points_for_goal: POINTS_FOR_GOAL,
+            points_for_assist: POINTS_FOR_ASSIST,
+            points_reduction_game_4: 100 - FACTOR_4TH_GAME*100,
+            points_reduction_game_5: 100 - FACTOR_5TH_GAME*100
+        },
+        player: {
+            name: player,
+            id: player
+        },
+        points: points_summary,
+        games: []
+    };
+    math.games = gamesStat;
+    return math;
 }

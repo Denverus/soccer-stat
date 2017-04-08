@@ -51,11 +51,16 @@ var nav = [
         title: 'Captains',
         icon: 'king',
         url: '/captains'
+    },
+    {
+        title: 'Ratings',
+        icon: 'king',
+        url: '/ratings'
     }
 ];
 
-getNavFor = function(url) {
-    for(var i = 0; i < nav.length; i++) {
+getNavFor = function (url) {
+    for (var i = 0; i < nav.length; i++) {
         if (nav[i].url == url) {
             nav[i].active = true;
         } else {
@@ -69,18 +74,19 @@ app.get('/', function (request, response) {
     var year = new Date().getFullYear();
     gameTool.loadIndexPageData(year, function (data) {
         var uiData = {
-                lastGame: data.lastGame,
-                games: data.gameList,
-                scorers: data.scorers,
-                assists: data.assists,
-                glas: data.glas,
-                winners: data.winners,
-                captains: data.captains,
-                years: data.years,
-                currentYear: year,
-                nav: getNavFor('/'),
-                url: '/year'
-            };
+            lastGame: data.lastGame,
+            games: data.gameList,
+            ratings: data.ratings,
+            scorers: data.scorers,
+            assists: data.assists,
+            glas: data.glas,
+            winners: data.winners,
+            captains: data.captains,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor('/'),
+            url: '/year'
+        };
         console.log('Index page data ', uiData);
         response.render('pages/index', uiData);
     });
@@ -118,7 +124,7 @@ app.get('/api/1.0/index', function (request, response) {
             captains: data.captains
         };
         console.log('Games list ', data);
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
     });
 });
 
@@ -139,7 +145,7 @@ app.get('/games/:year', function (request, response) {
 app.get('/api/1.0/games', function (request, response) {
     gameTool.loadGamesPageData(function (games) {
         console.log('Games list ', games);
-        response.end( JSON.stringify(games));
+        response.end(JSON.stringify(games));
     });
 });
 
@@ -166,7 +172,7 @@ app.get('/api/1.0/game/:gameId', function (request, response) {
             gameStat: data.gameStat,
             nav: getNavFor('')
         };
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
     });
 });
 
@@ -191,7 +197,7 @@ app.get('/api/1.0/players', function (request, response) {
             players: players,
             nav: getNavFor('/players')
         };
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
     });
 });
 
@@ -217,7 +223,7 @@ app.get('/api/1.0/scorers/:year', function (request, response) {
             scorers: players,
             nav: getNavFor('/scorers')
         };
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
     });
 });
 
@@ -241,9 +247,9 @@ app.get('/api/1.0/assists', function (request, response) {
         console.log('Player list ', players);
         var data = {
             assists: players,
-                nav: getNavFor('/assists')
+            nav: getNavFor('/assists')
         };
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
     });
 });
 
@@ -268,7 +274,7 @@ app.get('/api/1.0/glas', function (request, response) {
             glas: players,
             nav: getNavFor('/glas')
         };
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
     });
 });
 
@@ -282,7 +288,7 @@ app.get('/player/:playerId/:year', function (request, response) {
             years: data.years,
             currentYear: year,
             nav: getNavFor(''),
-            url: '/player/'+playerId
+            url: '/player/' + playerId
         });
     });
 });
@@ -294,7 +300,7 @@ app.get('/api/1.0/player/:playerId', function (request, response) {
             player: player,
             nav: getNavFor('')
         };
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
     });
 });
 
@@ -303,7 +309,7 @@ app.get('/winners/:year', function (request, response) {
     gameTool.loadWinnersPageData(year, 'point', function (data) {
         console.log('Winners', data);
         response.render('pages/winners', {
-        	winners: data.winners,
+            winners: data.winners,
             years: data.years,
             currentYear: year,
             nav: getNavFor('/winners'),
@@ -319,7 +325,7 @@ app.get('/api/1.0/winners', function (request, response) {
             winners: winners,
             nav: getNavFor('/winners')
         };
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
     });
 });
 
@@ -344,7 +350,7 @@ app.get('/api/1.0/captains', function (request, response) {
             captains: captains,
             nav: getNavFor('/captains')
         };
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
     });
 });
 
@@ -368,7 +374,39 @@ app.get('/api/1.0/trinity/:size', function (request, response) {
             trinity: trinity,
             nav: getNavFor('')
         };
-        response.end( JSON.stringify(data));
+        response.end(JSON.stringify(data));
+    });
+});
+
+
+app.get('/ratings/:year', function (request, response) {
+    var year = request.params.year;
+    gameTool.loadRatingsPageData(function (data) {
+        var pageData = {
+            ratings: data.ratings,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor('/ratings'),
+            url: '/ratings'
+        }
+        console.log('Ratings pae data ', pageData);
+        response.render('pages/ratings', pageData);
+    });
+});
+
+app.get('/math/:player/:year', function (request, response) {
+    var year = request.params.year;
+    var player = request.params.player;
+    gameTool.loadRatingsMathPageData(player, function (data) {
+        var pageData = {
+            math: data.math,
+            years: data.years,
+            currentYear: year,
+            nav: getNavFor('/ratings'),
+            url: '/ratings'
+        }
+        console.log('Ratings math data ', pageData);
+        response.render('pages/math', pageData);
     });
 });
 

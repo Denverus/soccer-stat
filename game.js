@@ -1131,7 +1131,7 @@ loadRatings = function (response) {
                 playerRating.progress_place = oldPosition - position;
             }
             if (oldPoints != null) {
-                playerRating.progress_point = Math.floor(oldPoints - playerRating.points);
+                playerRating.progress_point = playerRating.points - oldPoints;
             }
 
             position++;

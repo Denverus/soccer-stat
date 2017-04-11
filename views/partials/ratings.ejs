@@ -25,7 +25,7 @@
         <%# Place %>
         <th scope="row"><%= i + 1 %>
             <% if (player_rating.progress_place > 0) { %>
-                <span style="color:#00FF00;"><%= player_rating.progress_place %></span>
+                <span style="color:#32CD32;">+<%= player_rating.progress_place %></span>
             <% } %>
             <% if (player_rating.progress_place < 0) { %>
                 <span style="color:#FF0000;"><%= player_rating.progress_place %></span>
@@ -46,15 +46,15 @@
             <% } %>
         <% } %>
 
-        <td>
+        <th>
             <a href="/math/<%= ratings[i].id %>/<%= currentYear %>"><%= ratings[i].points %></a>
-            <% if (player_rating.progress_place > 0) { %>
-                <span style="color:#00FF00;">+<%= player_rating.progress_point %></span>
+            <% if (player_rating.progress_point > 0) { %>
+                <span style="color:#32CD32;">+<%= player_rating.progress_point %></span>
             <% } %>
-            <% if (player_rating.progress_place < 0) { %>
+            <% if (player_rating.progress_point < 0) { %>
                 <span style="color:#FF0000;"><%= player_rating.progress_point %></span>
             <% } %>
-        </td>
+        </th>
     </tr>
     <% } %>
     </tbody>

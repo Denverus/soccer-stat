@@ -3,6 +3,9 @@ var gameTool = require('./game');
 var statTool = require('./stat');
 var app = express();
 
+var bugsnag = require("bugsnag");
+bugsnag.register("93ce3221d97e205fa6d130939e07f0e3");
+
 app.set('port', (process.env.PORT || 5000));
 
 app.use(express.static(__dirname + '/public'));
